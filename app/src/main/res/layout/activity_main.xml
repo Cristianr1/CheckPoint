@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="130dp"
+                android:src="@drawable/parkline" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="35dp">
+
+            <Button
+                android:id="@+id/in_Id"
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:layout_marginBottom="20dp"
+                android:background="#1774BD"
+                android:text="Entrada"
+                android:textColor="#ffffff"
+                android:textSize="35sp" />
+
+            <Button
+                android:id="@+id/out_Id"
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:layout_marginBottom="20dp"
+                android:background="#1774BD"
+                android:text="Salida"
+                android:textColor="#ffffff"
+                android:textSize="35dp" />
+
+            <Button
+                android:id="@+id/disc_Id"
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:layout_marginBottom="20dp"
+                android:background="#1774BD"
+                android:text="Descuento"
+                android:textColor="#ffffff"
+                android:textSize="35dp" />
+
+
+            <Button
+                android:id="@+id/format_Id"
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:layout_marginBottom="20dp"
+                android:background="#1774BD"
+                android:text="Inicializar"
+                android:textColor="#ffffff"
+                android:textSize="35dp" />
+
+
+            <Button
+                android:id="@+id/config_Id"
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:background="#1774BD"
+                android:text="Ajustes"
+                android:textColor="#ffffff"
+                android:textSize="35dp" />
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

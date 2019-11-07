@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">CheckPoint</string>
+    <string-array name="planets_array">
+        <item>Tiempo</item>
+        <item>Porcentaje</item>
+    </string-array>
+</resources>
