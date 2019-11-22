@@ -100,7 +100,6 @@ public class Discount extends AppCompatActivity {
         if (!intent.hasExtra(NfcAdapter.EXTRA_TAG)) {
             return;
         }
-        String action = intent.getAction();
 
         Tag nfcTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
         Mifare mifare = new Mifare(nfcTag);
@@ -135,13 +134,12 @@ public class Discount extends AppCompatActivity {
             switch (mifare.connectTag()) {
                 case Mifare.MIFARE_CONNECTION_SUCCESS:
                     if (mifare.authentificationKey(Mifare.KOITI_KEY1, Mifare.KEY_TYPE_A, 1)) {
-                        byte[] datosB1 = mifare.readMifareTagBlock(1, 1);
-                        byte[] datosB2 = mifare.readMifareTagBlock(1, 2);
+                        byte[] datosB1 = mifare.readMifareTagBlock(1, 1);//read data that that belongs to block 1
+                        byte[] datosB2 = mifare.readMifareTagBlock(1, 2);//read data that that belongs to block 2
                         byte[] writeData = new byte[16];
 
                         int code = config.getValueInt("code", context);
                         int id = config.getValueInt("id", context);
-                        int consecutive = config.getValueInt("consecutive", context);
 
                         for (int i = 0; i < 16; i++) {
                             writeData[i] = datosB2[i];

@@ -1,415 +1,590 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".Configuration">
+    android:layout_height="match_parent">
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:layout_editor_absoluteX="46dp"
-        tools:layout_editor_absoluteY="8dp">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <LinearLayout
+        <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.245">
+            android:layout_gravity="center"
+            android:layout_margin="12dp"
+            android:layout_marginBottom="20dp"
+            card_view:cardCornerRadius="12dp"
+            card_view:cardElevation="6dp">
 
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:focusable="true"
-                android:focusableInTouchMode="true" />
-
-            <requestFocus />
-
-            <TextView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="30dp"
-                android:layout_marginEnd="30dp"
-                android:text="Código Parqueadero"
-                android:textSize="20sp" />
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-            <EditText
-                android:id="@+id/codeInput"
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true" />
+
+                <requestFocus />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"
+                    android:text="Código Parqueadero"
+                    android:textSize="20sp" />
+
+                <EditText
+                    android:id="@+id/codeInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"
+                    android:layout_marginBottom="10dp"
+                    android:backgroundTint="#1774BD"
+                    android:ems="10"
+                    android:hint="Código Parqueadero"
+                    android:inputType="number"
+                    android:textCursorDrawable="@null" />
+
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"
+                    android:text="ID Parqueadero"
+                    android:textSize="20sp" />
+
+                <EditText
+                    android:id="@+id/idInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"
+                    android:layout_marginBottom="10dp"
+                    android:backgroundTint="#1774BD"
+                    android:ems="10"
+                    android:hint="ID Parqueadero"
+                    android:inputType="number"
+                    android:textCursorDrawable="@null" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="12dp"
+            android:layout_marginBottom="20dp"
+            card_view:cardCornerRadius="12dp"
+            card_view:cardElevation="6dp">
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="30dp"
-                android:layout_marginEnd="30dp"
-                android:layout_marginBottom="10dp"
-                android:backgroundTint="#1774BD"
-                android:ems="10"
-                android:hint="Código Parqueadero"
-                android:inputType="number"
-                android:textCursorDrawable="@null" />
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-            <TextView
-                android:id="@+id/textView3"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="10dp"
+                    android:layout_weight="2"
+                    android:gravity="center"
+                    android:text="Descuentos"
+                    android:textColor="@android:color/black"
+                    android:textSize="25sp" />
+
+
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TableRow
+                        android:layout_marginStart="30dp"
+                        android:layout_marginEnd="30dp">
+
+                        <CheckBox
+                            android:id="@+id/Desc1Id"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:scaleX="1.1"
+                            android:scaleY="1.1"
+                            android:textSize="20sp" />
+
+                        <EditText
+                            android:hint="Nombre descuento 1"/>
+
+                    </TableRow>
+
+                </TableLayout>
+
+                <TextView
+                    android:id="@+id/descCod1_Id"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"
+                    android:text="Código descuento 1"
+                    android:textSize="20sp" />
+
+                <EditText
+                    android:id="@+id/desc1Input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:backgroundTint="#1774BD"
+                    android:ems="10"
+                    android:hint="Introduzca un valor entre 0 y 255"
+                    android:inputType="number"
+                    android:textCursorDrawable="@null" />
+
+                <Spinner
+                    android:id="@+id/spinner_discount1"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp" />
+
+                <EditText
+                    android:id="@+id/discountValue1Input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"
+                    android:layout_marginBottom="15dp"
+                    android:backgroundTint="#1774BD"
+                    android:ems="10"
+                    android:hint="Valor descuento"
+                    android:inputType="number"
+                    android:textCursorDrawable="@null" />
+
+
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TableRow
+                        android:layout_marginStart="30dp"
+                        android:layout_marginEnd="30dp">
+
+                        <CheckBox
+                            android:id="@+id/Desc2Id"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:scaleX="1.1"
+                            android:scaleY="1.1"
+                            android:textSize="20sp" />
+
+                        <EditText
+                            android:hint="Nombre descuento 2"/>
+
+                    </TableRow>
+
+                </TableLayout>
+
+                <TextView
+                    android:id="@+id/descCod2_Id"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"
+                    android:text="Código descuento 2"
+                    android:textSize="20sp" />
+
+                <EditText
+                    android:id="@+id/desc2Input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:backgroundTint="#1774BD"
+                    android:ems="10"
+                    android:hint="Introduzca un valor entre 0 y 255"
+                    android:inputType="number"
+                    android:textCursorDrawable="@null" />
+
+                <Spinner
+                    android:id="@+id/spinner_discount2"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp" />
+
+                <EditText
+                    android:id="@+id/discountValue2Input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"
+                    android:backgroundTint="#1774BD"
+                    android:ems="10"
+                    android:hint="Valor descuento"
+                    android:inputType="number"
+                    android:textCursorDrawable="@null" />
+
+            </LinearLayout>
+
+
+
+        </android.support.v7.widget.CardView>
+
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="12dp"
+            android:layout_marginBottom="20dp"
+            card_view:cardCornerRadius="12dp"
+            card_view:cardElevation="6dp">
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="30dp"
-                android:layout_marginEnd="30dp"
-                android:text="ID Parqueadero"
-                android:textSize="20sp" />
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-            <EditText
-                android:id="@+id/idInput"
+                <CheckBox
+                    android:id="@+id/entradaId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="30dp"
+                    android:scaleX="1.1"
+                    android:scaleY="1.1"
+                    android:text="Entrada"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/textViewIn_Id"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginEnd="30dp"
+                    android:layout_marginRight="30dp"
+                    android:text="Consecutivo de Entrada"
+                    android:textSize="20sp" />
+
+                <EditText
+                    android:id="@+id/consecutiveInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginEnd="30dp"
+                    android:layout_marginRight="30dp"
+                    android:backgroundTint="#1774BD"
+                    android:ems="10"
+                    android:hint="Consecutivo de entrada"
+                    android:inputType="number"
+                    android:textCursorDrawable="@null" />
+
+                <CheckBox
+                    android:id="@+id/carroId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="70dp"
+                    android:layout_marginRight="70dp"
+                    android:scaleX="1.1"
+                    android:scaleY="1.1"
+                    android:text="Carro"
+                    android:textSize="20sp" />
+
+                <CheckBox
+                    android:id="@+id/motoId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="70dp"
+                    android:layout_marginRight="70dp"
+                    android:scaleX="1.1"
+                    android:scaleY="1.1"
+                    android:text="Moto"
+                    android:textSize="20sp" />
+
+                <CheckBox
+                    android:id="@+id/bicicletaId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="70dp"
+                    android:layout_marginRight="70dp"
+                    android:layout_marginBottom="10dp"
+                    android:scaleX="1.1"
+                    android:scaleY="1.1"
+                    android:text="Bicicleta"
+                    android:textSize="20sp" />
+
+                <CheckBox
+                    android:id="@+id/fotoId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="70dp"
+                    android:layout_marginRight="70dp"
+                    android:scaleX="1.1"
+                    android:scaleY="1.1"
+                    android:text="Foto"
+                    android:textSize="20sp" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="12dp"
+            android:layout_marginBottom="20dp"
+            card_view:cardCornerRadius="12dp"
+            card_view:cardElevation="6dp">
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="30dp"
-                android:layout_marginEnd="30dp"
-                android:layout_marginBottom="10dp"
-                android:backgroundTint="#1774BD"
-                android:ems="10"
-                android:hint="ID Parqueadero"
-                android:inputType="number"
-                android:textCursorDrawable="@null" />
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-            <CheckBox
-                android:id="@+id/entradaId"
+                <CheckBox
+                    android:id="@+id/salidaId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="30dp"
+                    android:layout_marginBottom="5dp"
+                    android:scaleX="1.1"
+                    android:scaleY="1.1"
+                    android:text="Salida"
+                    android:textSize="20sp" />
+
+                <CheckBox
+                    android:id="@+id/tdgId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginEnd="30dp"
+                    android:layout_marginRight="30dp"
+                    android:scaleX="1.1"
+                    android:scaleY="1.1"
+                    android:text="Tiempo de Gracia"
+                    android:textSize="20sp" />
+
+                <EditText
+                    android:id="@+id/tdgTextId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginEnd="30dp"
+                    android:layout_marginRight="30dp"
+                    android:backgroundTint="#1774BD"
+                    android:ems="10"
+                    android:hint="Tiempo en minutos"
+                    android:inputType="number"
+                    android:textCursorDrawable="@null" />
+
+                <CheckBox
+                    android:id="@+id/payId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginEnd="30dp"
+                    android:layout_marginRight="30dp"
+                    android:layout_marginBottom="20dp"
+                    android:scaleX="1.1"
+                    android:scaleY="1.1"
+                    android:text="Sin Pago"
+                    android:textSize="20sp" />
+
+                <CheckBox
+                    android:id="@+id/FormatId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="30dp"
+                    android:scaleX="1.1"
+                    android:scaleY="1.1"
+                    android:text="Inicializar"
+                    android:textSize="20sp" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="12dp"
+            android:layout_marginBottom="20dp"
+            card_view:cardCornerRadius="12dp"
+            card_view:cardElevation="6dp">
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="50dp"
-                android:layout_marginRight="50dp"
-                android:scaleX="1.1"
-                android:scaleY="1.1"
-                android:text="Entrada"
-                android:textSize="20sp" />
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-            <TextView
-                android:id="@+id/textViewIn_Id"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="60dp"
-                android:layout_marginEnd="60dp"
-                android:text="Consecutivo de Entrada"
-                android:textSize="20sp" />
-
-            <EditText
-                android:id="@+id/consecutiveInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="60dp"
-                android:layout_marginRight="30dp"
-                android:backgroundTint="#1774BD"
-                android:ems="10"
-                android:hint="Consecutivo de entrada"
-                android:inputType="number"
-                android:textCursorDrawable="@null" />
-
-            <CheckBox
-                android:id="@+id/carroId"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="70dp"
-                android:layout_marginRight="70dp"
-                android:scaleX="1.1"
-                android:scaleY="1.1"
-                android:text="Carro"
-                android:textSize="20sp" />
-
-            <CheckBox
-                android:id="@+id/motoId"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="70dp"
-                android:layout_marginRight="70dp"
-                android:scaleX="1.1"
-                android:scaleY="1.1"
-                android:text="Moto"
-                android:textSize="20sp" />
-
-            <CheckBox
-                android:id="@+id/bicicletaId"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="70dp"
-                android:layout_marginRight="70dp"
-                android:layout_marginBottom="10dp"
-                android:scaleX="1.1"
-                android:scaleY="1.1"
-                android:text="Bicicleta"
-                android:textSize="20sp" />
-
-            <CheckBox
-                android:id="@+id/fotoId"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="70dp"
-                android:layout_marginRight="70dp"
-                android:layout_marginBottom="20dp"
-                android:scaleX="1.1"
-                android:scaleY="1.1"
-                android:text="Foto"
-                android:textSize="20sp" />
-
-            <CheckBox
-                android:id="@+id/salidaId"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="50dp"
-                android:layout_marginRight="50dp"
-                android:scaleX="1.1"
-                android:scaleY="1.1"
-                android:text="Salida"
-                android:textSize="20sp" />
-
-            <CheckBox
-                android:id="@+id/tdgId"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="70dp"
-                android:layout_marginRight="70dp"
-                android:scaleX="1.1"
-                android:scaleY="1.1"
-                android:text="Tiempo de Gracia"
-                android:textSize="20sp" />
-
-            <EditText
-                android:id="@+id/tdgTextId"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="90dp"
-                android:layout_marginLeft="60dp"
-                android:layout_marginEnd="30dp"
-                android:layout_marginRight="30dp"
-                android:backgroundTint="#1774BD"
-                android:ems="10"
-                android:hint="Tiempo en minutos"
-                android:inputType="number"
-                android:textCursorDrawable="@null" />
-
-            <CheckBox
-                android:id="@+id/payId"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="70dp"
-                android:layout_marginRight="70dp"
-                android:layout_marginBottom="20dp"
-                android:scaleX="1.1"
-                android:scaleY="1.1"
-                android:text="Sin Pago"
-                android:textSize="20sp" />
-
-            <CheckBox
-                android:id="@+id/DescId"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="50dp"
-                android:layout_marginRight="50dp"
-                android:scaleX="1.1"
-                android:scaleY="1.1"
-                android:text="Descuentos"
-                android:textSize="20sp" />
-
-            <TextView
-                android:id="@+id/descCod_Id"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="60dp"
-                android:layout_marginEnd="60dp"
-                android:text="Código descuento"
-                android:textSize="20sp" />
-
-            <EditText
-                android:id="@+id/descInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="60dp"
-                android:layout_marginRight="30dp"
-                android:layout_marginBottom="10dp"
-                android:backgroundTint="#1774BD"
-                android:ems="10"
-                android:hint="Introduzca un valor entre 0 y 255"
-                android:inputType="number"
-                android:textCursorDrawable="@null" />
-
-            <Spinner
-                android:id="@+id/tipo_spinner"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="70dp"
-                android:layout_marginRight="70dp" />
-
-            <EditText
-                android:id="@+id/discountValueInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="60dp"
-                android:layout_marginRight="30dp"
-                android:layout_marginBottom="20dp"
-                android:backgroundTint="#1774BD"
-                android:ems="10"
-                android:hint="Valor descuento"
-                android:inputType="number"
-                android:textCursorDrawable="@null" />
-
-            <CheckBox
-                android:id="@+id/FormatId"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="50dp"
-                android:layout_marginRight="50dp"
-                android:layout_marginBottom="20dp"
-                android:scaleX="1.1"
-                android:scaleY="1.1"
-                android:text="Inicializar"
-                android:textSize="20sp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="30dp"
-                android:layout_marginEnd="30dp"
-                android:layout_marginBottom="10dp"
-                android:text="Sincronización"
-                android:textColor="@android:color/black"
-                android:textSize="20sp" />
-
-            <TextView
-                android:id="@+id/ipVIew"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="60dp"
-                android:layout_marginEnd="60dp"
-                android:text="Dirección ip"
-                android:textSize="20sp" />
-
-            <EditText
-                android:id="@+id/ipInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="60dp"
-                android:layout_marginRight="30dp"
-                android:layout_marginBottom="20dp"
-                android:backgroundTint="#1774BD"
-                android:ems="10"
-                android:hint="Introduzca la IP"
-                android:inputType="phone"
-                android:textCursorDrawable="@null" />
-
-            <TextView
-                android:id="@+id/nodeVIew"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="60dp"
-                android:layout_marginEnd="60dp"
-                android:text="Node id"
-                android:textSize="20sp" />
-
-            <EditText
-                android:id="@+id/nodeIdInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="60dp"
-                android:layout_marginRight="30dp"
-                android:layout_marginBottom="20dp"
-                android:backgroundTint="#1774BD"
-                android:ems="10"
-                android:inputType="text"
-                android:hint="Introduzca el node id"
-                android:textCursorDrawable="@null" />
-
-            <TextView
-                android:id="@+id/nodeGroupVIew"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="60dp"
-                android:layout_marginEnd="60dp"
-                android:text="Node group"
-                android:textSize="20sp" />
-
-            <EditText
-                android:id="@+id/nodeGroupInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="60dp"
-                android:layout_marginRight="30dp"
-                android:layout_marginBottom="20dp"
-                android:backgroundTint="#1774BD"
-                android:ems="10"
-                android:inputType="text"
-                android:hint="Introduzca el node group"
-                android:textCursorDrawable="@null" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="10dp"
+                    android:layout_weight="2"
+                    android:gravity="center"
+                    android:text="Sincronización"
+                    android:textColor="@android:color/black"
+                    android:textSize="25sp" />
 
 
-            <TextView
-                android:id="@+id/publicadorVIew"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="60dp"
-                android:layout_marginEnd="60dp"
-                android:text="Publicador"
-                android:textSize="20sp" />
+                <TextView
+                    android:id="@+id/ipVIew"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"
+                    android:text="Dirección ip"
+                    android:textSize="20sp" />
 
-            <EditText
-                android:id="@+id/publicadorInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="60dp"
-                android:layout_marginRight="30dp"
-                android:layout_marginBottom="20dp"
-                android:backgroundTint="#1774BD"
-                android:ems="10"
-                android:hint="Introduzca el publicador"
-                android:inputType="text"
-                android:textCursorDrawable="@null" />
+                <EditText
+                    android:id="@+id/ipInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"
+                    android:layout_marginBottom="20dp"
+                    android:backgroundTint="#1774BD"
+                    android:ems="10"
+                    android:hint="Introduzca la IP"
+                    android:inputType="phone"
+                    android:textCursorDrawable="@null" />
 
-            <Button
-                android:id="@+id/delete_Id"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="50dp"
-                android:layout_marginRight="50dp"
-                android:layout_marginBottom="20dp"
-                android:background="#1774BD"
-                android:text="Borrar Datos"
-                android:textColor="#ffffff"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:id="@+id/nodeVIew"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"
+                    android:text="Node id"
+                    android:textSize="20sp" />
 
+                <EditText
+                    android:id="@+id/nodeIdInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"
+                    android:layout_marginBottom="20dp"
+                    android:backgroundTint="#1774BD"
+                    android:ems="10"
+                    android:hint="Introduzca el node id"
+                    android:textCursorDrawable="@null" />
 
-            <Button
-                android:id="@+id/sync_Id"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="50dp"
-                android:layout_marginRight="50dp"
-                android:layout_marginBottom="20dp"
-                android:background="#1774BD"
-                android:text="Sincronizar"
-                android:textColor="#ffffff"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:id="@+id/nodeGroupVIew"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"
+                    android:text="Node group"
+                    android:textSize="20sp" />
 
-            <Button
-                android:id="@+id/exit_Id"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="50dp"
-                android:layout_marginRight="50dp"
-                android:layout_marginBottom="20dp"
-                android:background="#1774BD"
-                android:text="Salir"
-                android:textColor="#ffffff"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </LinearLayout>
-
-    </ScrollView>
+                <EditText
+                    android:id="@+id/nodeGroupInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"
+                    android:layout_marginBottom="20dp"
+                    android:backgroundTint="#1774BD"
+                    android:ems="10"
+                    android:hint="Introduzca el node group"
+                    android:textCursorDrawable="@null" />
 
 
-</android.support.constraint.ConstraintLayout>
+                <TextView
+                    android:id="@+id/publicadorVIew"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"
+                    android:text="Publicador"
+                    android:textSize="20sp" />
+
+                <EditText
+                    android:id="@+id/publicadorInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"
+                    android:backgroundTint="#1774BD"
+                    android:ems="10"
+                    android:hint="Introduzca el publicador"
+                    android:textCursorDrawable="@null" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <Button
+            android:id="@+id/delete_Id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"
+            android:layout_marginBottom="20dp"
+            android:background="#1774BD"
+            android:text="Borrar Datos"
+            android:textColor="#ffffff" />
+
+
+        <Button
+            android:id="@+id/sync_Id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"
+            android:layout_marginBottom="20dp"
+            android:background="#1774BD"
+            android:text="Sincronizar"
+            android:textColor="#ffffff" />
+
+        <Button
+            android:id="@+id/exit_Id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"
+            android:layout_marginBottom="20dp"
+            android:background="#1774BD"
+            android:text="Salir"
+            android:textColor="#ffffff" />
+
+    </LinearLayout>
+
+</ScrollView>

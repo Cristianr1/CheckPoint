@@ -2,7 +2,6 @@ package com.koiti.checkpoint;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,23 +27,20 @@ import org.jumpmind.symmetric.android.SQLiteOpenHelperRegistry;
 import org.jumpmind.symmetric.android.SymmetricService;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 
 public class Configuration extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private Context context;
-    private Button out, delete, sync;
     private CheckBox checkBoxEntrada, checkBoxSalida, checkBoxDescuento, checkBoxCarro, checkBoxMoto, checkBoxBicicleta,
             checkBoxFoto, checkBoxTdg, checkBoxPay, checkBoxFormat;
-    EditText codeInput, idInput, consecutiveInput, tdgInput, descInput, discountValueInput, ipInput, nodeInput, nodegroupInput, publicadorInput;
+    EditText codeInput, idInput, consecutiveInput, tdgInput, ipInput, nodeInput, nodegroupInput, publicadorInput;
+    EditText desc1Input, discountValue1Input, desc2Input, discountValue2Input, desc3Input, discountValue3Input;
 
     private String ip = "";
     private String node = "";
     private String publicador = "";
     private String nodeGroup = "";
-    private DbProvider.DatabaseHelper mOpenHelper;
-
 
     ConfigStorage config = new ConfigStorage();
 
@@ -68,14 +64,14 @@ public class Configuration extends AppCompatActivity implements AdapterView.OnIt
         checkBoxTdg = findViewById(R.id.tdgId);
         checkBoxPay = findViewById(R.id.payId);
 
-        checkBoxDescuento = findViewById(R.id.DescId);
+        checkBoxDescuento = findViewById(R.id.Desc1Id);
 
         codeInput = findViewById(R.id.codeInput);
         idInput = findViewById(R.id.idInput);
         consecutiveInput = findViewById(R.id.consecutiveInput);
         tdgInput = findViewById(R.id.tdgTextId);
-        descInput = findViewById(R.id.descInput);
-        discountValueInput = findViewById(R.id.discountValueInput);
+        desc1Input = findViewById(R.id.desc1Input);
+        discountValue1Input = findViewById(R.id.discountValue1Input);
         ipInput = findViewById(R.id.ipInput);
         nodeInput = findViewById(R.id.nodeIdInput);
         nodegroupInput = findViewById(R.id.nodeGroupInput);
@@ -83,83 +79,36 @@ public class Configuration extends AppCompatActivity implements AdapterView.OnIt
 
         checkBoxFormat = findViewById(R.id.FormatId);
 
-        delete = findViewById(R.id.delete_Id);
-        sync = findViewById(R.id.sync_Id);
-        out = findViewById(R.id.exit_Id);
+        Button delete = findViewById(R.id.delete_Id);
+        Button sync = findViewById(R.id.sync_Id);
+        Button out = findViewById(R.id.exit_Id);
 
+        new Thread(new ThreadCod()).start();
+        new Thread(new ThreadIn()).start();
+        new Thread(new ThreadOut()).start();
+        new Thread(new ThreadDisc()).start();
+        new Thread(new ThreadSync()).start();
 
-        Boolean entrada = config.getValueBoolean("entrada", context);
-        Boolean carro = config.getValueBoolean("carro", context);
-        Boolean moto = config.getValueBoolean("moto", context);
-        Boolean bicicleta = config.getValueBoolean("bicicleta", context);
-        Boolean foto = config.getValueBoolean("foto", context);
-
-        Boolean salida = config.getValueBoolean("salida", context);
-        Boolean tdgcheck = config.getValueBoolean("tdgcheck", context);
-        Boolean pago = config.getValueBoolean("pago", context);
-
-        Boolean descuento = config.getValueBoolean("descuento", context);
-
-        Boolean formatear = config.getValueBoolean("formatear", context);
-
-        int code = config.getValueInt("code", context);
-        int id = config.getValueInt("id", context);
-        int consecutive = config.getValueInt("consecutive", context);
-        int tdg = config.getValueInt("tdg", context);
-        int discount = config.getValueInt("discount", context);
-        int discountValue = config.getValueInt("discountValue", context);
-
-        ip = config.getValueString("ip", context);
-        node = config.getValueString("node", context);
-        publicador = config.getValueString("publicador", context);
-        nodeGroup = config.getValueString("group", context);
-
-        codeInput.setText(Integer.toString(code));
-        idInput.setText(Integer.toString(id));
-        consecutiveInput.setText(Integer.toString(consecutive));
-        tdgInput.setText(Integer.toString(tdg));
-        descInput.setText(Integer.toString(discount));
-        discountValueInput.setText(Integer.toString(discountValue));
-
-        ipInput.setText(ip);
-        nodeInput.setText(node);
-        publicadorInput.setText(publicador);
-        nodegroupInput.setText(nodeGroup);
-
-        checkBoxEntrada.setChecked(entrada);
-        checkBoxCarro.setChecked(carro);
-        checkBoxMoto.setChecked(moto);
-        checkBoxBicicleta.setChecked(bicicleta);
-        checkBoxFoto.setChecked(foto);
-
-        checkBoxSalida.setChecked(salida);
-        checkBoxTdg.setChecked(tdgcheck);
-        checkBoxPay.setChecked(pago);
-
-        checkBoxDescuento.setChecked(descuento);
-
-        checkBoxFormat.setChecked(formatear);
-
-        codeInput.addTextChangedListener(listenerCode);
-        idInput.addTextChangedListener(listenerId);
-        consecutiveInput.addTextChangedListener(listenerConsecutive);
-        tdgInput.addTextChangedListener(listenerTDG);
-        descInput.addTextChangedListener(listenerDiscount);
-        discountValueInput.addTextChangedListener(listenerDiscountValue);
-        ipInput.addTextChangedListener(listenerIp);
-        nodeInput.addTextChangedListener(listenerNode);
-        nodegroupInput.addTextChangedListener(listenerGroup);
-        publicadorInput.addTextChangedListener(listenerPublicador);
+        codeInput.addTextChangedListener(numberTextWatcher);
+        idInput.addTextChangedListener(numberTextWatcher);
+        consecutiveInput.addTextChangedListener(numberTextWatcher);
+        tdgInput.addTextChangedListener(numberTextWatcher);
+        desc1Input.addTextChangedListener(numberTextWatcher);
+        discountValue1Input.addTextChangedListener(numberTextWatcher);
+        ipInput.addTextChangedListener(stringTextWatcher);
+        nodeInput.addTextChangedListener(stringTextWatcher);
+        nodegroupInput.addTextChangedListener(stringTextWatcher);
+        publicadorInput.addTextChangedListener(stringTextWatcher);
 
         delete.setOnClickListener(mListener);
         sync.setOnClickListener(mListener);
         out.setOnClickListener(mListener);
 
-        Spinner spinner = findViewById(R.id.tipo_spinner);
+        Spinner spinner = findViewById(R.id.spinner_discount1);
         spinner.setOnItemSelectedListener(this);
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.planets_array, android.R.layout.simple_spinner_item);
+                R.array.type_discount, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
@@ -187,121 +136,7 @@ public class Configuration extends AppCompatActivity implements AdapterView.OnIt
         }
     };
 
-    private final TextWatcher listenerCode = new TextWatcher() {
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            int value = 0;
-            String text = s.toString();
-            if (!text.equals("")) {
-                value = Integer.parseInt(text);
-            }
-            config.save(value, "code", context);
-        }
-    };
-
-    private final TextWatcher listenerId = new TextWatcher() {
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            int value = 0;
-            String text = s.toString();
-            if (!text.equals("")) {
-                value = Integer.parseInt(text);
-            }
-            config.save(value, "id", context);
-        }
-    };
-
-    private final TextWatcher listenerConsecutive = new TextWatcher() {
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            int value = 0;
-            String text = s.toString();
-            if (!text.equals("")) {
-                value = Integer.parseInt(text);
-            }
-            config.save(value, "consecutive", context);
-        }
-    };
-
-    private final TextWatcher listenerTDG = new TextWatcher() {
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            int value = 0;
-            String text = s.toString();
-            if (!text.equals("")) {
-                value = Integer.parseInt(text);
-            }
-            config.save(value, "tdg", context);
-        }
-    };
-
-    private final TextWatcher listenerDiscount = new TextWatcher() {
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            int value = 0;
-            String text = s.toString();
-            if (!text.equals("")) {
-                value = Integer.parseInt(text);
-            }
-            if (descInput.getText().toString().trim().equalsIgnoreCase("")) {
-                descInput.setError("El valor debe estar entre 0 y 255");
-            } else if (Integer.parseInt(descInput.getText().toString().trim()) > 255) {
-                descInput.setError("El valor debe estar entre 0 y 255");
-            } else {
-                config.save(value, "discount", context);
-            }
-        }
-    };
-
-    private final TextWatcher listenerDiscountValue = new TextWatcher() {
+    private final TextWatcher numberTextWatcher = new TextWatcher() {
 
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -320,27 +155,45 @@ public class Configuration extends AppCompatActivity implements AdapterView.OnIt
                 value = Integer.parseInt(text);
             }
 
-            if (type == 1) {
-                if (discountValueInput.getText().toString().trim().equalsIgnoreCase("")) {
-                    discountValueInput.setError("El valor debe estar en el rango de 0-100%");
-                } else if (Integer.parseInt(discountValueInput.getText().toString().trim()) > 100) {
-                    discountValueInput.setError("No puede exceder el 100%");
+            if (codeInput.getText().hashCode() == s.hashCode())
+                config.save(value, "code", context);
+            else if (idInput.getText().hashCode() == s.hashCode())
+                config.save(value, "id", context);
+            else if (consecutiveInput.getText().hashCode() == s.hashCode())
+                config.save(value, "consecutive", context);
+            else if (tdgInput.getText().hashCode() == s.hashCode())
+                config.save(value, "tdg", context);
+            else if (desc1Input.getText().hashCode() == s.hashCode()) {
+                if (desc1Input.getText().toString().trim().equalsIgnoreCase("")) {
+                    desc1Input.setError("El valor debe estar entre 0 y 255");
+                } else if (Integer.parseInt(desc1Input.getText().toString().trim()) > 255) {
+                    desc1Input.setError("El valor debe estar entre 0 y 255");
                 } else {
-                    config.save(value, "discountValue", context);
+                    config.save(value, "discount", context);
                 }
             } else {
-                if (discountValueInput.getText().toString().trim().equalsIgnoreCase("")) {
-                    discountValueInput.setError("El valor debe estar en el rango de 0-2047 minutos");
-                } else if (Integer.parseInt(discountValueInput.getText().toString().trim()) > 2047) {
-                    discountValueInput.setError("No puede exceder los 2047 minutos");
+                if (type == 1) {
+                    if (discountValue1Input.getText().toString().trim().equalsIgnoreCase("")) {
+                        discountValue1Input.setError("El valor debe estar en el rango de 0-100%");
+                    } else if (Integer.parseInt(discountValue1Input.getText().toString().trim()) > 100) {
+                        discountValue1Input.setError("No puede exceder el 100%");
+                    } else {
+                        config.save(value, "discountValue", context);
+                    }
                 } else {
-                    config.save(value, "discountValue", context);
+                    if (discountValue1Input.getText().toString().trim().equalsIgnoreCase("")) {
+                        discountValue1Input.setError("El valor debe estar en el rango de 0-2047 minutos");
+                    } else if (Integer.parseInt(discountValue1Input.getText().toString().trim()) > 2047) {
+                        discountValue1Input.setError("No puede exceder los 2047 minutos");
+                    } else {
+                        config.save(value, "discountValue", context);
+                    }
                 }
             }
         }
     };
 
-    private final TextWatcher listenerIp = new TextWatcher() {
+    private final TextWatcher stringTextWatcher = new TextWatcher() {
 
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -353,84 +206,19 @@ public class Configuration extends AppCompatActivity implements AdapterView.OnIt
         @Override
         public void afterTextChanged(Editable s) {
             String text = s.toString();
-            config.save(text, "ip", context);
+
+            if (ipInput.getText().hashCode() == s.hashCode())
+                config.save(text, "ip", context);
+            else if (nodeInput.getText().hashCode() == s.hashCode())
+                config.save(text, "node", context);
+            else if (nodegroupInput.getText().hashCode() == s.hashCode())
+                config.save(text, "group", context);
+            else if (publicadorInput.getText().hashCode() == s.hashCode())
+                config.save(text, "publicador", context);
         }
     };
 
-    private final TextWatcher listenerNode = new TextWatcher() {
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            String text = s.toString();
-            config.save(text, "node", context);
-        }
-    };
-
-    private final TextWatcher listenerGroup = new TextWatcher() {
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            String text = s.toString();
-            config.save(text, "group", context);
-        }
-    };
-
-    private final TextWatcher listenerPublicador = new TextWatcher() {
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            String text = s.toString();
-            config.save(text, "publicador", context);
-        }
-    };
-
-//    @Override
-//    public void finish() {
-
-//        ContentValues registerServer = new ContentValues();
-//        ContentValues registerAndroid = new ContentValues();
-
-//        registerServer.put("sync_url", url);
-//
-//        registerAndroid.put("node_id", node);
-//        registerAndroid.put("external_id", node);
-//        registerAndroid.put("node_group_id", nodeGroup);
-//
-//
-//        String updateSentenceServer = "database_type = " + "'MySQL'";
-//        String updateSentenceAndroid = "database_type = " + "'sqlite'";
-//
-//        db.update("sym_node", registerServer, updateSentenceServer, null);
-//        db.update("sym_node", registerAndroid, updateSentenceAndroid, null);
-
-//        super.finish();
-//    }
-
-    public void sincronizar(){
+    public void sincronizar() {
         ip = config.getValueString("ip", context);
         node = config.getValueString("node", context);
         publicador = config.getValueString("publicador", context);
@@ -467,8 +255,8 @@ public class Configuration extends AppCompatActivity implements AdapterView.OnIt
 
         Intent mStartActivity = new Intent(context, MainActivity.class);
         int mPendingIntentId = 123456;
-        PendingIntent mPendingIntent = PendingIntent.getActivity(context, mPendingIntentId,    mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
-        AlarmManager mgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        PendingIntent mPendingIntent = PendingIntent.getActivity(context, mPendingIntentId, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+        AlarmManager mgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
         finish();
         System.exit(0);
@@ -599,4 +387,114 @@ public class Configuration extends AppCompatActivity implements AdapterView.OnIt
 
         return builder.create();
     }
+
+    private class ThreadCod implements Runnable {
+        @Override
+        public void run() {
+            int code = config.getValueInt("code", context);
+            int id = config.getValueInt("id", context);
+
+            codeInput.setText(Integer.toString(code));
+            idInput.setText(Integer.toString(id));
+        }
+    }
+
+    private class ThreadIn implements Runnable {
+        @Override
+        public void run() {
+            Boolean entrada = config.getValueBoolean("entrada", context);
+            int consecutive = config.getValueInt("consecutive", context);
+            Boolean carro = config.getValueBoolean("carro", context);
+            Boolean moto = config.getValueBoolean("moto", context);
+            Boolean bicicleta = config.getValueBoolean("bicicleta", context);
+            Boolean foto = config.getValueBoolean("foto", context);
+
+            checkBoxEntrada.setChecked(entrada);
+            consecutiveInput.setText(Integer.toString(consecutive));
+            checkBoxCarro.setChecked(carro);
+            checkBoxMoto.setChecked(moto);
+            checkBoxBicicleta.setChecked(bicicleta);
+            checkBoxFoto.setChecked(foto);
+        }
+    }
+
+    private class ThreadOut implements Runnable {
+        @Override
+        public void run() {
+            Boolean salida = config.getValueBoolean("salida", context);
+            Boolean tdgcheck = config.getValueBoolean("tdgcheck", context);
+            int tdg = config.getValueInt("tdg", context);
+            Boolean pago = config.getValueBoolean("pago", context);
+            Boolean formatear = config.getValueBoolean("formatear", context);
+
+            checkBoxSalida.setChecked(salida);
+            checkBoxTdg.setChecked(tdgcheck);
+            tdgInput.setText(Integer.toString(tdg));
+            checkBoxPay.setChecked(pago);
+            checkBoxFormat.setChecked(formatear);
+        }
+    }
+
+    private class ThreadDisc implements Runnable {
+        @Override
+        public void run() {
+            new Thread(new ThreadDisc1()).start();
+        }
+    }
+
+    private class ThreadDisc1 implements Runnable {
+        @Override
+        public void run() {
+            Boolean descuento = config.getValueBoolean("discountActive1", context);
+            int discount = config.getValueInt("discount1", context);
+            int discountValue = config.getValueInt("discountValue1", context);
+
+            desc1Input.setText(Integer.toString(discount));
+            discountValue1Input.setText(Integer.toString(discountValue));
+            checkBoxDescuento.setChecked(descuento);
+        }
+    }
+
+    private class ThreadDisc2 implements Runnable {
+        @Override
+        public void run() {
+            Boolean descuento = config.getValueBoolean("discountActive2", context);
+            int discount = config.getValueInt("discount2", context);
+            int discountValue = config.getValueInt("discountValue2", context);
+
+            desc2Input.setText(Integer.toString(discount));
+            discountValue2Input.setText(Integer.toString(discountValue));
+            checkBoxDescuento.setChecked(descuento);
+        }
+    }
+
+    private class ThreadDisc3 implements Runnable {
+        @Override
+        public void run() {
+            Boolean descuento = config.getValueBoolean("discountActive3", context);
+            int discount = config.getValueInt("discount3", context);
+            int discountValue = config.getValueInt("discountValue3", context);
+
+            desc3Input.setText(Integer.toString(discount));
+            discountValue3Input.setText(Integer.toString(discountValue));
+            checkBoxDescuento.setChecked(descuento);
+        }
+    }
+
+    private class ThreadSync implements Runnable {
+        @Override
+        public void run() {
+            ip = config.getValueString("ip", context);
+            node = config.getValueString("node", context);
+            publicador = config.getValueString("publicador", context);
+            nodeGroup = config.getValueString("group", context);
+
+            ipInput.setText(ip);
+            nodeInput.setText(node);
+            publicadorInput.setText(publicador);
+            nodegroupInput.setText(nodeGroup);
+        }
+    }
+
+
 }

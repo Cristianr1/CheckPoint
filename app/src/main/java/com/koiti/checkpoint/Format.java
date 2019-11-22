@@ -21,7 +21,9 @@ import java.util.Date;
 
 import es.dmoral.toasty.Toasty;
 
-
+/**
+ *Initialize the cards that belong to the parking
+ */
 public class Format extends AppCompatActivity {
 
     private Context context;
@@ -48,6 +50,7 @@ public class Format extends AppCompatActivity {
 
         final TextView textViewDate = findViewById(R.id.date_Id);
 
+        //This thread updates the date every minute
         final Handler someHandler = new Handler(getMainLooper());
         someHandler.postDelayed(new Runnable() {
             @Override
@@ -87,8 +90,6 @@ public class Format extends AppCompatActivity {
         if (!intent.hasExtra(NfcAdapter.EXTRA_TAG)) {
             return;
         }
-        String action = intent.getAction();
-
         Toasty.Config.getInstance().setTextSize(24).apply();
 
         Tag nfcTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
@@ -101,23 +102,24 @@ public class Format extends AppCompatActivity {
 
                         byte[] datosB1 = mifare.readMifareTagBlock(1, 1);
 
-                        byte[] writeDataB1 = new byte[16];
-                        byte[] writeDataB2 = new byte[16];
+                        byte[] writeDataB1 = new byte[16];//data that will be written in block 1
+                        byte[] writeDataB2 = new byte[16];//data that will be written in block 2
 
                         int code = config.getValueInt("code", context);
                         int id = config.getValueInt("id", context);
 
+                        //Initialize the arrays
                         for (int i = 0; i < 16; i++) {
                             writeDataB1[i] = (byte) 0;
                             writeDataB2[i] = (byte) 0;
                         }
 
                         if (datosB1 != null) {
+                            // evaluate if the card belongs to the parking
                             if (datosB1[1] == code && datosB1[3] == id) {
                                 writeDataB1[0] = (byte) 1;
                                 writeDataB1[1] = (byte) code;
                                 writeDataB1[3] = (byte) id;
-
 
                                 boolean row0 = mifare.writeMifareTag(1, 0, writeDataB2);
                                 boolean row1 = mifare.writeMifareTag(1, 1, writeDataB1);

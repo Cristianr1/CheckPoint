@@ -178,8 +178,6 @@ public class Entrance extends AppCompatActivity {
         if (!intent.hasExtra(NfcAdapter.EXTRA_TAG)) {
             return;
         }
-        String action = intent.getAction();
-
         code = config.getValueInt("code", context);
         id = config.getValueInt("id", context);
         consecutive = config.getValueInt("consecutive", context);
@@ -190,7 +188,6 @@ public class Entrance extends AppCompatActivity {
         Mifare mifare = new Mifare(nfcTag);
 
         byte[] writeDataB0 = new byte[16];
-
 
         fixed = Integer.toString(consecutive);
         ArrayList<Integer> dataPark = new ArrayList<>();
@@ -222,8 +219,6 @@ public class Entrance extends AppCompatActivity {
 
 
                         if (datosB1 != null && datosB2 != null) {
-//                            assert datosB1 != null;
-//                            assert datosB2 != null;
                             if (datosB1[0] == 1 && datosB1[1] == code && datosB1[3] == id) {
                                 if (datosB2[10] == 0 || datosB2[10] == 2) {
                                     byte[] writeData = new byte[16];
@@ -278,9 +273,6 @@ public class Entrance extends AppCompatActivity {
                                             }
 
                                             mifare.writeMifareTag(1, 0, writeDataB2);
-//                                            mifare.writeMifareTag(1, 1, writeDataB1);
-//                                            mifare.writeMifareTag(1, 2, writeDataB2);
-
                                             Toasty.error(Entrance.this, "Grabación Incorrecta", Toast.LENGTH_SHORT).show();
                                         }
                                     } else {
