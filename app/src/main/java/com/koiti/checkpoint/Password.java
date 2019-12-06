@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import es.dmoral.toasty.Toasty;
+
 public class Password extends AppCompatActivity {
 
     private Context context;
@@ -58,7 +60,7 @@ public class Password extends AppCompatActivity {
     }
 
     public void incorrect() {
-        Toast t = Toast.makeText(this, "Contraseña incorrecta", Toast.LENGTH_SHORT);
+        Toast t = Toasty.error(this, "Contraseña incorrecta", Toast.LENGTH_SHORT);
         t.show();
     }
 }

@@ -108,7 +108,7 @@ public class DbProvider extends ContentProvider {
     public boolean onCreate() {
         ConfigStorage config = new ConfigStorage();
 
-        String ip, node, nodeGroup;
+        String url, node, nodeGroup;
         // Creates a new helper object. Note that the database itself isn't opened until
         // something tries to access it, and it's only created if it doesn't already exist.
         mOpenHelper = new DatabaseHelper(getContext());
@@ -121,7 +121,7 @@ public class DbProvider extends ContentProvider {
 
         Intent intent = new Intent(getContext(), SymmetricService.class);
 
-        ip = config.getValueString("url", Objects.requireNonNull(getContext()));
+        url = config.getValueString("url", Objects.requireNonNull(getContext()));
         node = config.getValueString("node", getContext());
         nodeGroup = config.getValueString("group", getContext());
 
@@ -129,9 +129,9 @@ public class DbProvider extends ContentProvider {
 //            ip = node = nodeGroup = "null";
 
         intent.putExtra(SymmetricService.INTENTKEY_SQLITEOPENHELPER_REGISTRY_KEY, DATABASE_NAME);
-        intent.putExtra(SymmetricService.INTENTKEY_REGISTRATION_URL, REGISTRATION_URL);
-        intent.putExtra(SymmetricService.INTENTKEY_EXTERNAL_ID, NODE_ID);
-        intent.putExtra(SymmetricService.INTENTKEY_NODE_GROUP_ID, NODE_GROUP);
+        intent.putExtra(SymmetricService.INTENTKEY_REGISTRATION_URL, url);
+        intent.putExtra(SymmetricService.INTENTKEY_EXTERNAL_ID, node);
+        intent.putExtra(SymmetricService.INTENTKEY_NODE_GROUP_ID, nodeGroup);
         intent.putExtra(SymmetricService.INTENTKEY_START_IN_BACKGROUND, true);
 
         Properties properties = new Properties();

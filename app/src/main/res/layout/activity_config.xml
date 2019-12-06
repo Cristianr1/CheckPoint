@@ -126,6 +126,8 @@
                             android:textSize="20sp" />
 
                         <EditText
+                            android:id="@+id/discount1_name_Id"
+                            android:inputType="text"
                             android:hint="Nombre descuento 1"/>
 
                     </TableRow>
@@ -167,7 +169,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="30dp"
                     android:layout_marginEnd="30dp"
-                    android:layout_marginBottom="15dp"
+                    android:layout_marginBottom="30dp"
                     android:backgroundTint="#1774BD"
                     android:ems="10"
                     android:hint="Valor descuento"
@@ -192,6 +194,8 @@
                             android:textSize="20sp" />
 
                         <EditText
+                            android:id="@+id/discount2_name_Id"
+                            android:inputType="text"
                             android:hint="Nombre descuento 2"/>
 
                     </TableRow>
@@ -229,6 +233,74 @@
 
                 <EditText
                     android:id="@+id/discountValue2Input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"
+                    android:layout_marginBottom="30dp"
+                    android:backgroundTint="#1774BD"
+                    android:ems="10"
+                    android:hint="Valor descuento"
+                    android:inputType="number"
+                    android:textCursorDrawable="@null" />
+
+
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TableRow
+                        android:layout_marginStart="30dp"
+                        android:layout_marginEnd="30dp">
+
+                        <CheckBox
+                            android:id="@+id/Desc3Id"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:scaleX="1.1"
+                            android:scaleY="1.1"
+                            android:textSize="20sp" />
+
+                        <EditText
+                            android:id="@+id/discount3_name_Id"
+                            android:inputType="text"
+                            android:hint="Nombre descuento 3"/>
+
+                    </TableRow>
+
+                </TableLayout>
+
+                <TextView
+                    android:id="@+id/descCod3_Id"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"
+                    android:text="Código descuento 3"
+                    android:textSize="20sp" />
+
+                <EditText
+                    android:id="@+id/desc3Input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:backgroundTint="#1774BD"
+                    android:ems="10"
+                    android:hint="Introduzca un valor entre 0 y 255"
+                    android:inputType="number"
+                    android:textCursorDrawable="@null" />
+
+                <Spinner
+                    android:id="@+id/spinner_discount3"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp" />
+
+                <EditText
+                    android:id="@+id/discountValue3Input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="30dp"
@@ -503,6 +575,7 @@
                     android:backgroundTint="#1774BD"
                     android:ems="10"
                     android:hint="Introduzca el node id"
+                    android:inputType="text"
                     android:textCursorDrawable="@null" />
 
                 <TextView
@@ -524,6 +597,7 @@
                     android:backgroundTint="#1774BD"
                     android:ems="10"
                     android:hint="Introduzca el node group"
+                    android:inputType="text"
                     android:textCursorDrawable="@null" />
 
 
@@ -545,6 +619,7 @@
                     android:backgroundTint="#1774BD"
                     android:ems="10"
                     android:hint="Introduzca el publicador"
+                    android:inputType="text"
                     android:textCursorDrawable="@null" />
 
             </LinearLayout>

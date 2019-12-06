@@ -41,7 +41,9 @@ public class MainActivity extends AppCompatActivity {
 
         Boolean entrada = configuration.getValueBoolean("entrada", context);
         Boolean salida = configuration.getValueBoolean("salida", context);
-        Boolean descuento = configuration.getValueBoolean("descuento", context);
+        Boolean descuento1 = configuration.getValueBoolean("discountActive1", context);
+        Boolean descuento2 = configuration.getValueBoolean("discountActive2", context);
+        Boolean descuento3 = configuration.getValueBoolean("discountActive3", context);
         Boolean formatear = configuration.getValueBoolean("formatear", context);
 
         if (!entrada) {
@@ -56,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
             out.setVisibility(View.VISIBLE);
         }
 
-        if (!descuento) {
+        if (!descuento1 && !descuento2 && !descuento3) {
             disc.setVisibility(View.GONE);
         } else {
             disc.setVisibility(View.VISIBLE);
@@ -103,7 +105,9 @@ public class MainActivity extends AppCompatActivity {
 
         Boolean entrada = configuration.getValueBoolean("entrada", context);
         Boolean salida = configuration.getValueBoolean("salida", context);
-        Boolean descuento = configuration.getValueBoolean("descuento", context);
+        Boolean descuento1 = configuration.getValueBoolean("discountActive1", context);
+        Boolean descuento2 = configuration.getValueBoolean("discountActive2", context);
+        Boolean descuento3 = configuration.getValueBoolean("discountActive3", context);
         Boolean formatear = configuration.getValueBoolean("formatear", context);
 
         if (!entrada) {
@@ -118,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
             out.setVisibility(View.VISIBLE);
         }
 
-        if (!descuento) {
+        if (!descuento1 && !descuento2 && !descuento3) {
             disc.setVisibility(View.GONE);
         } else {
             disc.setVisibility(View.VISIBLE);
@@ -143,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed () {
+    public void onBackPressed() {
     }
 
 

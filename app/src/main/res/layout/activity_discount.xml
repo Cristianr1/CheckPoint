@@ -20,20 +20,20 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
-    <TextView
-        android:id="@+id/cardtext"
-        android:layout_width="297dp"
-        android:layout_height="151dp"
-        android:layout_gravity="center_horizontal|center_vertical"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="52dp"
-        android:layout_marginEnd="30dp"
-        android:text="Presione el botón grabar para registrar descuentos en la tarjeta."
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/datediscount_Id" />
+<!--    <TextView-->
+<!--        android:id="@+id/cardtext"-->
+<!--        android:layout_width="297dp"-->
+<!--        android:layout_height="151dp"-->
+<!--        android:layout_gravity="center_horizontal|center_vertical"-->
+<!--        android:layout_marginStart="30dp"-->
+<!--        android:layout_marginTop="52dp"-->
+<!--        android:layout_marginEnd="30dp"-->
+<!--        android:text="Presione el botón grabar para registrar descuentos en la tarjeta."-->
+<!--        android:textSize="20sp"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.5"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/datediscount_Id" />-->
 
     <LinearLayout
         android:id="@+id/linearLayoutDiscount"
@@ -44,30 +44,54 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardtext">
+        app:layout_constraintTop_toBottomOf="@+id/datediscount_Id">
 
         <Button
-            android:id="@+id/savedisc_Id"
+            android:id="@+id/discount1_Id"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="90dp"
             android:layout_marginStart="50dp"
             android:layout_marginEnd="50dp"
-            android:layout_marginBottom="60dp"
+            android:layout_marginBottom="40dp"
             android:background="#1774BD"
-            android:text="grabar"
+            android:text="descuento1"
             android:textColor="#ffffff"
-            android:textSize="20sp" />
+            android:textSize="28sp" />
+
+        <Button
+            android:id="@+id/discount2_Id"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="50dp"
+            android:layout_marginBottom="40dp"
+            android:background="#1774BD"
+            android:text="descuento2"
+            android:textColor="#ffffff"
+            android:textSize="28sp" />
+
+        <Button
+            android:id="@+id/discount3_Id"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="50dp"
+            android:layout_marginBottom="40dp"
+            android:background="#1774BD"
+            android:text="descuento3"
+            android:textColor="#ffffff"
+            android:textSize="28sp" />
 
         <Button
             android:id="@+id/exitdisc_Id"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="90dp"
             android:layout_marginStart="50dp"
             android:layout_marginEnd="50dp"
             android:background="#1774BD"
             android:text="Salir"
             android:textColor="#ffffff"
-            android:textSize="20sp" />
+            android:textSize="28sp" />
 
     </LinearLayout>
 

@@ -32,10 +32,12 @@ import java.util.List;
 
 public class Configuration extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private Context context;
-    private CheckBox checkBoxEntrada, checkBoxSalida, checkBoxDescuento, checkBoxCarro, checkBoxMoto, checkBoxBicicleta,
+    private CheckBox checkBoxEntrada, checkBoxSalida, checkBoxDescuento1, checkBoxDescuento2, checkBoxDescuento3, checkBoxCarro, checkBoxMoto, checkBoxBicicleta,
             checkBoxFoto, checkBoxTdg, checkBoxPay, checkBoxFormat;
     EditText codeInput, idInput, consecutiveInput, tdgInput, ipInput, nodeInput, nodegroupInput, publicadorInput;
     EditText desc1Input, discountValue1Input, desc2Input, discountValue2Input, desc3Input, discountValue3Input;
+    EditText discount1Name, discount2Name, discount3Name;
+    Spinner spinnerDiscount1, spinnerDiscount2, spinnerDiscount3;
 
     private String ip = "";
     private String node = "";
@@ -64,14 +66,23 @@ public class Configuration extends AppCompatActivity implements AdapterView.OnIt
         checkBoxTdg = findViewById(R.id.tdgId);
         checkBoxPay = findViewById(R.id.payId);
 
-        checkBoxDescuento = findViewById(R.id.Desc1Id);
+        checkBoxDescuento1 = findViewById(R.id.Desc1Id);
+        checkBoxDescuento2 = findViewById(R.id.Desc2Id);
+        checkBoxDescuento3 = findViewById(R.id.Desc3Id);
 
         codeInput = findViewById(R.id.codeInput);
         idInput = findViewById(R.id.idInput);
         consecutiveInput = findViewById(R.id.consecutiveInput);
         tdgInput = findViewById(R.id.tdgTextId);
+        discount1Name = findViewById(R.id.discount1_name_Id);
+        discount2Name = findViewById(R.id.discount2_name_Id);
+        discount3Name = findViewById(R.id.discount3_name_Id);
         desc1Input = findViewById(R.id.desc1Input);
+        desc2Input = findViewById(R.id.desc2Input);
+        desc3Input = findViewById(R.id.desc3Input);
         discountValue1Input = findViewById(R.id.discountValue1Input);
+        discountValue2Input = findViewById(R.id.discountValue2Input);
+        discountValue3Input = findViewById(R.id.discountValue3Input);
         ipInput = findViewById(R.id.ipInput);
         nodeInput = findViewById(R.id.nodeIdInput);
         nodegroupInput = findViewById(R.id.nodeGroupInput);
@@ -94,8 +105,16 @@ public class Configuration extends AppCompatActivity implements AdapterView.OnIt
         consecutiveInput.addTextChangedListener(numberTextWatcher);
         tdgInput.addTextChangedListener(numberTextWatcher);
         desc1Input.addTextChangedListener(numberTextWatcher);
+        desc2Input.addTextChangedListener(numberTextWatcher);
+        desc3Input.addTextChangedListener(numberTextWatcher);
         discountValue1Input.addTextChangedListener(numberTextWatcher);
+        discountValue2Input.addTextChangedListener(numberTextWatcher);
+        discountValue3Input.addTextChangedListener(numberTextWatcher);
+        discount1Name.addTextChangedListener(stringTextWatcher);
+        discount2Name.addTextChangedListener(stringTextWatcher);
+        discount3Name.addTextChangedListener(stringTextWatcher);
         ipInput.addTextChangedListener(stringTextWatcher);
+        nodeInput.addTextChangedListener(stringTextWatcher);
         nodeInput.addTextChangedListener(stringTextWatcher);
         nodegroupInput.addTextChangedListener(stringTextWatcher);
         publicadorInput.addTextChangedListener(stringTextWatcher);
@@ -104,16 +123,40 @@ public class Configuration extends AppCompatActivity implements AdapterView.OnIt
         sync.setOnClickListener(mListener);
         out.setOnClickListener(mListener);
 
-        Spinner spinner = findViewById(R.id.spinner_discount1);
-        spinner.setOnItemSelectedListener(this);
+        spinnerDiscount1 = findViewById(R.id.spinner_discount1);
+        spinnerDiscount1.setOnItemSelectedListener(this);
         // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+        ArrayAdapter<CharSequence> adapterDiscount1 = ArrayAdapter.createFromResource(this,
                 R.array.type_discount, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapterDiscount1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
-        spinner.setAdapter(adapter);
-        spinner.setSelection(config.getValueInt("tipo", context));
+        spinnerDiscount1.setAdapter(adapterDiscount1);
+        spinnerDiscount1.setSelection(config.getValueInt("typeDiscount1", context));
+
+
+        spinnerDiscount2 = findViewById(R.id.spinner_discount2);
+        spinnerDiscount2.setOnItemSelectedListener(this);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapterDiscount2 = ArrayAdapter.createFromResource(this,
+                R.array.type_discount, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapterDiscount2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinnerDiscount2.setAdapter(adapterDiscount2);
+        spinnerDiscount2.setSelection(config.getValueInt("typeDiscount2", context));
+
+
+        spinnerDiscount3 = findViewById(R.id.spinner_discount3);
+        spinnerDiscount3.setOnItemSelectedListener(this);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapterDiscount3 = ArrayAdapter.createFromResource(this,
+                R.array.type_discount, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapterDiscount3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinnerDiscount3.setAdapter(adapterDiscount3);
+        spinnerDiscount3.setSelection(config.getValueInt("typeDiscount3", context));
 
         addListenerOnIn();
     }
@@ -148,7 +191,9 @@ public class Configuration extends AppCompatActivity implements AdapterView.OnIt
 
         @Override
         public void afterTextChanged(Editable s) {
-            int type = config.getValueInt("tipo", context);
+            int type1 = config.getValueInt("typeDiscount1", context);
+            int type2 = config.getValueInt("typeDiscount2", context);
+            int type3 = config.getValueInt("typeDiscount3", context);
             int value = 0;
             String text = s.toString();
             if (!text.equals("")) {
@@ -169,16 +214,32 @@ public class Configuration extends AppCompatActivity implements AdapterView.OnIt
                 } else if (Integer.parseInt(desc1Input.getText().toString().trim()) > 255) {
                     desc1Input.setError("El valor debe estar entre 0 y 255");
                 } else {
-                    config.save(value, "discount", context);
+                    config.save(value, "discount1", context);
                 }
-            } else {
-                if (type == 1) {
+            } else if (desc2Input.getText().hashCode() == s.hashCode()) {
+                if (desc2Input.getText().toString().trim().equalsIgnoreCase("")) {
+                    desc2Input.setError("El valor debe estar entre 0 y 255");
+                } else if (Integer.parseInt(desc2Input.getText().toString().trim()) > 255) {
+                    desc2Input.setError("El valor debe estar entre 0 y 255");
+                } else {
+                    config.save(value, "discount2", context);
+                }
+            } else if (desc3Input.getText().hashCode() == s.hashCode()) {
+                if (desc3Input.getText().toString().trim().equalsIgnoreCase("")) {
+                    desc3Input.setError("El valor debe estar entre 0 y 255");
+                } else if (Integer.parseInt(desc3Input.getText().toString().trim()) > 255) {
+                    desc3Input.setError("El valor debe estar entre 0 y 255");
+                } else {
+                    config.save(value, "discount3", context);
+                }
+            } else if (discountValue1Input.getText().hashCode() == s.hashCode()) {
+                if (type1 == 1) {
                     if (discountValue1Input.getText().toString().trim().equalsIgnoreCase("")) {
                         discountValue1Input.setError("El valor debe estar en el rango de 0-100%");
                     } else if (Integer.parseInt(discountValue1Input.getText().toString().trim()) > 100) {
                         discountValue1Input.setError("No puede exceder el 100%");
                     } else {
-                        config.save(value, "discountValue", context);
+                        config.save(value, "discountValue1", context);
                     }
                 } else {
                     if (discountValue1Input.getText().toString().trim().equalsIgnoreCase("")) {
@@ -186,7 +247,43 @@ public class Configuration extends AppCompatActivity implements AdapterView.OnIt
                     } else if (Integer.parseInt(discountValue1Input.getText().toString().trim()) > 2047) {
                         discountValue1Input.setError("No puede exceder los 2047 minutos");
                     } else {
-                        config.save(value, "discountValue", context);
+                        config.save(value, "discountValue1", context);
+                    }
+                }
+            } else if (discountValue2Input.getText().hashCode() == s.hashCode()) {
+                if (type2 == 1) {
+                    if (discountValue2Input.getText().toString().trim().equalsIgnoreCase("")) {
+                        discountValue2Input.setError("El valor debe estar en el rango de 0-100%");
+                    } else if (Integer.parseInt(discountValue2Input.getText().toString().trim()) > 100) {
+                        discountValue2Input.setError("No puede exceder el 100%");
+                    } else {
+                        config.save(value, "discountValue2", context);
+                    }
+                } else {
+                    if (discountValue2Input.getText().toString().trim().equalsIgnoreCase("")) {
+                        discountValue2Input.setError("El valor debe estar en el rango de 0-2047 minutos");
+                    } else if (Integer.parseInt(discountValue2Input.getText().toString().trim()) > 2047) {
+                        discountValue2Input.setError("No puede exceder los 2047 minutos");
+                    } else {
+                        config.save(value, "discountValue2", context);
+                    }
+                }
+            } else if (discountValue3Input.getText().hashCode() == s.hashCode()) {
+                if (type3 == 1) {
+                    if (discountValue3Input.getText().toString().trim().equalsIgnoreCase("")) {
+                        discountValue3Input.setError("El valor debe estar en el rango de 0-100%");
+                    } else if (Integer.parseInt(discountValue3Input.getText().toString().trim()) > 100) {
+                        discountValue3Input.setError("No puede exceder el 100%");
+                    } else {
+                        config.save(value, "discountValue3", context);
+                    }
+                } else {
+                    if (discountValue3Input.getText().toString().trim().equalsIgnoreCase("")) {
+                        discountValue3Input.setError("El valor debe estar en el rango de 0-2047 minutos");
+                    } else if (Integer.parseInt(discountValue3Input.getText().toString().trim()) > 2047) {
+                        discountValue3Input.setError("No puede exceder los 2047 minutos");
+                    } else {
+                        config.save(value, "discountValue3", context);
                     }
                 }
             }
@@ -215,6 +312,12 @@ public class Configuration extends AppCompatActivity implements AdapterView.OnIt
                 config.save(text, "group", context);
             else if (publicadorInput.getText().hashCode() == s.hashCode())
                 config.save(text, "publicador", context);
+            else if (discount1Name.getText().hashCode() == s.hashCode())
+                config.save(text, "discount1name", context);
+            else if (discount2Name.getText().hashCode() == s.hashCode())
+                config.save(text, "discount2name", context);
+            else if (discount3Name.getText().hashCode() == s.hashCode())
+                config.save(text, "discount3name", context);
         }
     };
 
@@ -240,6 +343,7 @@ public class Configuration extends AppCompatActivity implements AdapterView.OnIt
 
         tablas.remove("sqlite_sequence");
         tablas.remove("android_metadata");
+        tablas.remove("tb_vehiculos");
 
         c.close();
 
@@ -335,12 +439,30 @@ public class Configuration extends AppCompatActivity implements AdapterView.OnIt
             }
         });
 
-        checkBoxDescuento.setOnClickListener(new View.OnClickListener() {
+        checkBoxDescuento1.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                Boolean desc = checkBoxDescuento.isChecked();
-                config.save(desc, "descuento", context);
+                Boolean desc = checkBoxDescuento1.isChecked();
+                config.save(desc, "discountActive1", context);
+            }
+        });
+
+        checkBoxDescuento2.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Boolean desc = checkBoxDescuento2.isChecked();
+                config.save(desc, "discountActive2", context);
+            }
+        });
+
+        checkBoxDescuento3.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Boolean desc = checkBoxDescuento3.isChecked();
+                config.save(desc, "discountActive3", context);
             }
         });
 
@@ -357,7 +479,14 @@ public class Configuration extends AppCompatActivity implements AdapterView.OnIt
     public void onItemSelected(AdapterView<?> parent, View view,
                                int pos, long id) {
         // An item was selected. You can retrieve the selected item using
-        config.save(pos, "tipo", context);
+
+        if (spinnerDiscount1.hashCode() == parent.hashCode())
+            config.save(pos, "typeDiscount1", context);
+        else if (spinnerDiscount2.hashCode() == parent.hashCode())
+            config.save(pos, "typeDiscount2", context);
+        else if (spinnerDiscount3.hashCode() == parent.hashCode())
+            config.save(pos, "typeDiscount3", context);
+
     }
 
     public void onNothingSelected(AdapterView<?> parent) {
@@ -439,6 +568,8 @@ public class Configuration extends AppCompatActivity implements AdapterView.OnIt
         @Override
         public void run() {
             new Thread(new ThreadDisc1()).start();
+            new Thread(new ThreadDisc2()).start();
+            new Thread(new ThreadDisc3()).start();
         }
     }
 
@@ -446,12 +577,14 @@ public class Configuration extends AppCompatActivity implements AdapterView.OnIt
         @Override
         public void run() {
             Boolean descuento = config.getValueBoolean("discountActive1", context);
+            String discountName = config.getValueString("discount1name", context);
             int discount = config.getValueInt("discount1", context);
             int discountValue = config.getValueInt("discountValue1", context);
 
+            discount1Name.setText(discountName);
             desc1Input.setText(Integer.toString(discount));
             discountValue1Input.setText(Integer.toString(discountValue));
-            checkBoxDescuento.setChecked(descuento);
+            checkBoxDescuento1.setChecked(descuento);
         }
     }
 
@@ -459,12 +592,14 @@ public class Configuration extends AppCompatActivity implements AdapterView.OnIt
         @Override
         public void run() {
             Boolean descuento = config.getValueBoolean("discountActive2", context);
+            String discountName = config.getValueString("discount2name", context);
             int discount = config.getValueInt("discount2", context);
             int discountValue = config.getValueInt("discountValue2", context);
 
+            discount2Name.setText(discountName);
             desc2Input.setText(Integer.toString(discount));
             discountValue2Input.setText(Integer.toString(discountValue));
-            checkBoxDescuento.setChecked(descuento);
+            checkBoxDescuento2.setChecked(descuento);
         }
     }
 
@@ -472,12 +607,14 @@ public class Configuration extends AppCompatActivity implements AdapterView.OnIt
         @Override
         public void run() {
             Boolean descuento = config.getValueBoolean("discountActive3", context);
+            String discountName = config.getValueString("discount3name", context);
             int discount = config.getValueInt("discount3", context);
             int discountValue = config.getValueInt("discountValue3", context);
 
+            discount3Name.setText(discountName);
             desc3Input.setText(Integer.toString(discount));
             discountValue3Input.setText(Integer.toString(discountValue));
-            checkBoxDescuento.setChecked(descuento);
+            checkBoxDescuento3.setChecked(descuento);
         }
     }
 
@@ -495,6 +632,4 @@ public class Configuration extends AppCompatActivity implements AdapterView.OnIt
             nodegroupInput.setText(nodeGroup);
         }
     }
-
-
 }
