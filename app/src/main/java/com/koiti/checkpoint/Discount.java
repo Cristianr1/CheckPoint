@@ -3,12 +3,14 @@ package com.koiti.checkpoint;
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Handler;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,8 +20,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.joda.time.DateTime;
+import org.joda.time.Minutes;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 import es.dmoral.toasty.Toasty;
 
@@ -27,8 +33,8 @@ public class Discount extends AppCompatActivity {
 
     private Context context;
     private NfcAdapter nfcAdapter;
-    private Button discount1, discount2, discount3, save, exit;
-    private Boolean active = false;
+    private Button discount1, discount2, discount3, exit;
+    private Boolean active = false, message;
     private int discount, type, discountValue, inpago;
 
     ConfigStorage config = new ConfigStorage();
@@ -64,6 +70,8 @@ public class Discount extends AppCompatActivity {
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         context = this;
         inpago = 0;
+
+        message = config.getValueBoolean("mensaje", context);
 
         Boolean descuento1 = config.getValueBoolean("discountActive1", context);
         Boolean descuento2 = config.getValueBoolean("discountActive2", context);
@@ -178,6 +186,15 @@ public class Discount extends AppCompatActivity {
 
                         if (datosB1 != null && datosB2 != null) {
 
+                            if (datosB2[0] == 0 && datosB2[1] == 0) {
+                                Toasty.error(getBaseContext(), "Tarjeta no posee ingreso", Toast.LENGTH_LONG).show();
+                                discount1.setBackgroundColor(Color.parseColor("#296DBA"));//Default Color
+                                discount2.setBackgroundColor(Color.parseColor("#296DBA"));//Default Color
+                                discount3.setBackgroundColor(Color.parseColor("#296DBA"));//Default Color
+                                active = false;
+                                break;
+                            }
+
                             int code = config.getValueInt("code", context);
                             int id = config.getValueInt("id", context);
 
@@ -187,13 +204,58 @@ public class Discount extends AppCompatActivity {
                             writeData[6] = (byte) discount;
                             writeData[9] = (byte) inpago;
 
-                            Log.d("stringbuilder Descuento", sbuilderDiscount + "--" + sbuilderInpago + "--");
-
                             if (datosB1[0] == 1 && datosB1[1] == code && datosB1[3] == id) {
                                 boolean row2 = mifare.writeMifareTag(1, 2, writeData);
-                                if (row2)
+                                if (row2) {
                                     Toasty.success(Discount.this, "Escritura Exitosa", Toast.LENGTH_SHORT).show();
-                                else
+
+                                    if (type == 0 && message) {
+//                                    String part1 = Integer.toBinaryString((datosB2[9]&0xFF));
+//                                    String part2 = Integer.toBinaryString((datosB2[5]&0xFF));
+                                        String part1 = Integer.toBinaryString(inpago);
+
+                                        String sMinutosRestantes = part1.substring(1, 4);
+                                        StringBuilder sbuilderMR = new StringBuilder(sMinutosRestantes); //Binario
+                                        sbuilderMR.append(sbuilderDiscount);
+
+                                        DateTime ldtEntrada = new DateTime(datosB2[0] + 2000, datosB2[1], datosB2[2], datosB2[3], datosB2[4]);
+                                        DateTime ldtActual = DateTime.now();
+                                        DateTime dtDiscount = ldtEntrada.plusMinutes(Integer.parseInt(String.valueOf(sbuilderMR), 2));
+
+                                        int minutosEntradaActual = Minutes.minutesBetween(ldtEntrada, ldtActual).getMinutes();
+                                        int minutosEntradaDescuento = Minutes.minutesBetween(ldtEntrada, dtDiscount).getMinutes();
+                                        final int minutosRestantes = minutosEntradaDescuento - minutosEntradaActual;
+
+                                        String success = "Quedan " + minutosRestantes + " minutos para salir del parqueadero";
+                                        String timeOut = "Descuento aplicado, por favor acerquese a caja";
+
+                                        final String finalMessage;
+
+                                        if (minutosRestantes > 0)
+                                            finalMessage = success;
+                                        else
+                                            finalMessage = timeOut;
+
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+//                                                alertaTiempoSalida(minutosRestantes).show();
+
+                                                AlertDialog builder = new AlertDialog.Builder(context).setTitle("Tiempo para salir")
+                                                        .setMessage(finalMessage)
+                                                        .setPositiveButton("OK",
+                                                                new DialogInterface.OnClickListener() {
+                                                                    @Override
+                                                                    public void onClick(DialogInterface dialog, int which) {
+                                                                    }
+                                                                }).show();
+
+                                                TextView textView = builder.findViewById(android.R.id.message);
+                                                textView.setTextSize(25);
+                                            }
+                                        });
+                                    }
+                                } else
                                     Toasty.error(Discount.this, "Grabación Incorrecta", Toast.LENGTH_SHORT).show();
                             } else
                                 Toasty.error(getBaseContext(), "" + "Tarjeta no pertenece al" +
@@ -261,17 +323,44 @@ public class Discount extends AppCompatActivity {
             if (discountValue > 2047) {
                 discountValue = 0;
             } else if (discountValue > 255 && discountValue < 2047) {
-                if (discountValue < 512) inpago = 17; //10001
-                if (discountValue >= 512 && discountValue < 1024) inpago = 27;//11011
-                if (discountValue >= 1024) inpago = 31;//11111
+                if (discountValue < 512) inpago = 19; //10011
+                if (discountValue > 767 && discountValue < 1024) inpago = 23;//10011
+                if (discountValue >= 1024) inpago = 25;//11001
             } else {
-                inpago = 1;
+                inpago = 17; //10001
             }
         } else {
-            inpago = 129;
+            inpago = 0;
             if (discountValue > 100) {
                 discountValue = 0;
             }
         }
+    }
+
+    public AlertDialog alertaTiempoSalida(int minutosRestantes) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+
+        if (minutosRestantes > 0)
+            builder.setTitle("Tiempo para salir")
+                    .setMessage("Quedan " + minutosRestantes + " minutos para salir del parqueadero")
+                    .setPositiveButton("OK",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                }
+                            });
+        else
+            builder.setTitle("Tiempo para salir")
+                    .setMessage("Descuento aplicado, por favor acerquese a caja")
+                    .setPositiveButton("OK",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                }
+                            });
+
+
+        return builder.create();
     }
 }

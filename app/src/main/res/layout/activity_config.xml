@@ -111,6 +111,33 @@
 
                 <TableLayout
                     android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="25dp">
+
+                    <TableRow
+                        android:layout_marginStart="30dp"
+                        android:layout_marginEnd="30dp">
+
+                        <CheckBox
+                            android:id="@+id/messageTime_Id"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:scaleX="1.1"
+                            android:scaleY="1.1"
+                            android:textSize="20sp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Mostrar mensaje"
+                            android:textSize="20sp" />
+
+                    </TableRow>
+
+                </TableLayout>
+
+                <TableLayout
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
                     <TableRow
@@ -488,6 +515,27 @@
                     android:scaleY="1.1"
                     android:text="Sin Pago"
                     android:textSize="20sp" />
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="12dp"
+            android:layout_marginBottom="20dp"
+            card_view:cardCornerRadius="12dp"
+            card_view:cardElevation="6dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="16dp">
+
 
                 <CheckBox
                     android:id="@+id/FormatId"
@@ -503,8 +551,6 @@
             </LinearLayout>
 
         </android.support.v7.widget.CardView>
-
-
 
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"

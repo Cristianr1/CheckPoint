@@ -46,7 +46,7 @@ public class Password extends AppCompatActivity {
                 Intent intent = null;
                 switch (pass) {
                     case "B800530*":
-                        intent = new Intent(context, Configuration.class);
+                        intent = new Intent(context, ConfigurationMINI.class);
                         startActivity(intent);
                         finish();
                         break;

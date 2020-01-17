@@ -38,6 +38,7 @@
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity android:name="com.koiti.checkpoint.Configuration" />
+        <activity android:name="com.koiti.checkpoint.ConfigurationMINI" />
         <activity android:name="com.koiti.checkpoint.Password" />
         <activity android:name="com.koiti.checkpoint.Entrance">
             <intent-filter>

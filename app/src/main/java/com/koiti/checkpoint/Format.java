@@ -22,7 +22,7 @@ import java.util.Date;
 import es.dmoral.toasty.Toasty;
 
 /**
- *Initialize the cards that belong to the parking
+ * Initialize the cards that belong to the parking
  */
 public class Format extends AppCompatActivity {
 
@@ -125,9 +125,18 @@ public class Format extends AppCompatActivity {
                                 boolean row1 = mifare.writeMifareTag(1, 1, writeDataB1);
                                 boolean row2 = mifare.writeMifareTag(1, 2, writeDataB2);
 
-                                if (row0 && row1 && row2)
-                                    Toasty.success(getBaseContext(), "" + "Escritura Exitosa", Toast.LENGTH_LONG).show();
-                                else
+                                if (row0 && row1 && row2) {
+                                    final Toast toasty = Toasty.success(Format.this, "" + "Escritura Exitosa", Toast.LENGTH_LONG);
+                                    toasty.show();
+
+                                    Handler handler = new Handler();
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            toasty.cancel();
+                                        }
+                                    }, 700);
+                                } else
                                     Toasty.error(getBaseContext(), "" + "La inicialización " +
                                             "ha fallado  por favor vuelva a intentarlo.", Toast.LENGTH_LONG).show();
 
@@ -146,7 +155,7 @@ public class Format extends AppCompatActivity {
                     break;
             }
         } else {
-            Toasty.warning(getBaseContext(), "Recuerde presionar el boton grabar para poder formatear " +
+            Toasty.warning(getBaseContext(), "Recuerde presionar el boton grabar para poder inicializar " +
                     "la tarjeta", Toast.LENGTH_LONG).show();
         }
     }

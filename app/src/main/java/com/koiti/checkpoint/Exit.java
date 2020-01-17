@@ -18,6 +18,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -26,10 +27,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.joda.time.DateTime;
+import org.joda.time.Minutes;
 import org.jumpmind.symmetric.android.SQLiteOpenHelperRegistry;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 import es.dmoral.toasty.Toasty;
@@ -173,8 +175,13 @@ public class Exit extends AppCompatActivity {
                             int ihour = Integer.parseInt(DateHour);
                             int iminut = Integer.parseInt(DateMinut);
 
-                            LocalDateTime ldtEntrada = LocalDateTime.of(datosB2[0] + 2000, datosB2[1], datosB2[2], datosB2[3], datosB2[4]);
-                            LocalDateTime ldtActual = LocalDateTime.of(iyear, imonth, iday, ihour, iminut);
+//                            API Java time
+//                            LocalDateTime ldtEntrada = LocalDateTime.of(datosB2[0] + 2000, datosB2[1], datosB2[2], datosB2[3], datosB2[4]);
+//                            LocalDateTime ldtActual = LocalDateTime.of(iyear, imonth, iday, ihour, iminut);
+
+                            DateTime ldtEntrada = new DateTime(datosB2[0] + 2000, datosB2[1], datosB2[2], datosB2[3], datosB2[4]);
+                            DateTime ldtActual = new DateTime(iyear, imonth, iday, ihour, iminut);
+
 
                             String sRead = new String(datosB0);
                             fixed = sRead.replaceAll("[^\\x20-\\x7e]", "");
@@ -201,7 +208,8 @@ public class Exit extends AppCompatActivity {
                                             if (!tdgcheck) {
 
                                                 if (datosB2[11] != 0 && datosB2[12] != 0 && datosB2[13] != 0) {
-                                                    LocalDateTime ldtMaxSalida = LocalDateTime.of(datosB2[11] + 2000, datosB2[12], datosB2[13], datosB2[14], datosB2[15]);
+//                                                    LocalDateTime ldtMaxSalida = LocalDateTime.of(datosB2[11] + 2000, datosB2[12], datosB2[13], datosB2[14], datosB2[15]);
+                                                    DateTime ldtMaxSalida = new DateTime(datosB2[11] + 2000, datosB2[12], datosB2[13], datosB2[14], datosB2[15]);
 
                                                     if (ldtActual.isBefore(ldtMaxSalida)) {
                                                         boolean row2 = mifare.writeMifareTag(1, 2, writeData);
@@ -219,7 +227,8 @@ public class Exit extends AppCompatActivity {
                                                     Toasty.error(getBaseContext(), "No registra pago", Toast.LENGTH_LONG).show();
                                                 }
                                             } else {
-                                                LocalDateTime tdgEntrada = ldtEntrada.plusMinutes(tdg);
+//                                                LocalDateTime tdgEntrada = ldtEntrada.plusMinutes(tdg);
+                                                DateTime tdgEntrada = ldtEntrada.plusMinutes(tdg);
 
                                                 if (ldtActual.isBefore(tdgEntrada)) {
                                                     boolean row2 = mifare.writeMifareTag(1, 2, writeData);
@@ -263,8 +272,8 @@ public class Exit extends AppCompatActivity {
                     break;
             }
         } else {
-            Toasty.warning(getBaseContext(), "Recuerde presionar un boton para poder hacer operaciones " +
-                    "en la tarjeta", Toast.LENGTH_LONG).show();
+//            Toasty.warning(getBaseContext(), "Recuerde presionar un boton para poder hacer operaciones " +
+//                    "en la tarjeta", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -287,6 +296,9 @@ public class Exit extends AppCompatActivity {
     }
 
     public void alertImage() {
+//        save.setBackgroundColor(Color.parseColor("#296DBA"));//Default Color
+        active = false;
+
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Exit.this);
         LayoutInflater image = LayoutInflater.from(Exit.this);
         final View view = image.inflate(R.layout.alert_image, null);
@@ -300,6 +312,7 @@ public class Exit extends AppCompatActivity {
         alertDialogBuilder.setPositiveButton("Sí           ", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
+                active = true;
                 photoCorrect = true;
             }
         });
@@ -313,7 +326,7 @@ public class Exit extends AppCompatActivity {
 
         alertView = view.findViewById(R.id.alertImage);
         alertView.setImageURI(photoURIG);
-//        alertView.setRotation(alertView.getRotation() + 90);
+        alertView.setRotation(alertView.getRotation() + 90);
 
         alertDialogBuilder.setView(view);
 
@@ -333,6 +346,21 @@ public class Exit extends AppCompatActivity {
         String updateSentence = "veh_id = " + fixed;
 
         db.update("tb_vehiculos", register, updateSentence, null);
+    }
+
+    public AlertDialog alertaTiempoSalida(int minutosRestantes) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        builder.setTitle("Tiempo para salir")
+                .setMessage("Quedan " + minutosRestantes + " minutos para salir del parqueadero")
+                .setPositiveButton("OK",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        });
+
+        return builder.create();
     }
 
 }
