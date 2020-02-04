@@ -30,6 +30,7 @@ public class Format extends AppCompatActivity {
     private NfcAdapter nfcAdapter;
     private Button save, exit;
     private Boolean active = false;
+    private Toast toasty;
 
     ConfigStorage config = new ConfigStorage();
 
@@ -75,6 +76,8 @@ public class Format extends AppCompatActivity {
                 case R.id.savedisc_Id:
                     save.setBackgroundColor(Color.parseColor("#02840A"));//Select Color
                     active = true;
+                    if (toasty != null)
+                        toasty.cancel();
                     break;
 
                 case R.id.exitdisc_Id:
@@ -155,8 +158,9 @@ public class Format extends AppCompatActivity {
                     break;
             }
         } else {
-            Toasty.warning(getBaseContext(), "Recuerde presionar el boton grabar para poder inicializar " +
-                    "la tarjeta", Toast.LENGTH_LONG).show();
+            toasty = Toasty.warning(getBaseContext(), "Recuerde presionar el boton grabar para poder inicializar " +
+                    "la tarjeta", Toast.LENGTH_LONG);
+            toasty.show();
         }
     }
 

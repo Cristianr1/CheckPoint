@@ -190,6 +190,7 @@ public class Exit extends AppCompatActivity {
                                 SharedPreferences settings = getSharedPreferences("KEY_DATA", 0);
                                 String sphoto = settings.getString(fixed, "");
                                 photoURIG = Uri.parse(sphoto);
+                                active = false;
 
                                 runOnUiThread(new Runnable() {
                                     @Override
@@ -297,7 +298,7 @@ public class Exit extends AppCompatActivity {
 
     public void alertImage() {
 //        save.setBackgroundColor(Color.parseColor("#296DBA"));//Default Color
-        active = false;
+//        active = false;
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Exit.this);
         LayoutInflater image = LayoutInflater.from(Exit.this);
@@ -321,6 +322,8 @@ public class Exit extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Toast.makeText(getApplicationContext(), "Se canceló la operación", Toast.LENGTH_SHORT).show();
+                save.setBackgroundColor(Color.parseColor("#296DBA"));//Default Color
+                active = false;
             }
         });
 

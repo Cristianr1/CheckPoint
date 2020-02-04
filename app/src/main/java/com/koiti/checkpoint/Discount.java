@@ -330,37 +330,10 @@ public class Discount extends AppCompatActivity {
                 inpago = 17; //10001
             }
         } else {
-            inpago = 0;
+            inpago = 129;
             if (discountValue > 100) {
                 discountValue = 0;
             }
         }
-    }
-
-    public AlertDialog alertaTiempoSalida(int minutosRestantes) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-
-
-        if (minutosRestantes > 0)
-            builder.setTitle("Tiempo para salir")
-                    .setMessage("Quedan " + minutosRestantes + " minutos para salir del parqueadero")
-                    .setPositiveButton("OK",
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            });
-        else
-            builder.setTitle("Tiempo para salir")
-                    .setMessage("Descuento aplicado, por favor acerquese a caja")
-                    .setPositiveButton("OK",
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            });
-
-
-        return builder.create();
     }
 }
