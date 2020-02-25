@@ -33,7 +33,7 @@ import java.util.List;
 public class ConfigurationMINI extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private Context context;
     private CheckBox checkBoxEntrada, checkBoxSalida, checkBoxMessageTime, checkBoxDescuento1, checkBoxDescuento2, checkBoxDescuento3, checkBoxCarro, checkBoxMoto, checkBoxBicicleta,
-            checkBoxFoto, checkBoxTdg, checkBoxPay, checkBoxFormat;
+            checkBoxFoto, checkBoxTdg, checkBoxPay, checkBoxInitialize, checkBoxRead, checkBoxFormat;
     EditText codeInput, idInput, consecutiveInput, tdgInput, ipInput, nodeInput, nodegroupInput, publicadorInput;
     EditText desc1Input, discountValue1Input, desc2Input, discountValue2Input, desc3Input, discountValue3Input;
     EditText discount1Name, discount2Name, discount3Name;
@@ -53,8 +53,11 @@ public class ConfigurationMINI extends AppCompatActivity implements AdapterView.
         context = this;
         setTitle("Configuración");
 
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        //Muestra toda la pantalla al hacer scroll y tener el teclado activo
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
+//        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
 
         checkBoxEntrada = findViewById(R.id.entradaId);
         checkBoxCarro = findViewById(R.id.carroId);
@@ -90,6 +93,8 @@ public class ConfigurationMINI extends AppCompatActivity implements AdapterView.
         nodegroupInput = findViewById(R.id.nodeGroupInput);
         publicadorInput = findViewById(R.id.publicadorInput);
 
+        checkBoxInitialize = findViewById(R.id.InitializeId);
+        checkBoxRead= findViewById(R.id.ReadCardId);
         checkBoxFormat = findViewById(R.id.FormatId);
 
         Button delete = findViewById(R.id.delete_Id);
@@ -186,6 +191,8 @@ public class ConfigurationMINI extends AppCompatActivity implements AdapterView.
         int tdg = config.getValueInt("tdg", context);
         Boolean pago = config.getValueBoolean("pago", context);
         Boolean mensajeTiempo = config.getValueBoolean("mensaje", context);
+        Boolean inicializar = config.getValueBoolean("inicializar", context);
+        Boolean lectura = config.getValueBoolean("lectura", context);
         Boolean formatear = config.getValueBoolean("formatear", context);
 
         checkBoxSalida.setChecked(salida);
@@ -193,6 +200,8 @@ public class ConfigurationMINI extends AppCompatActivity implements AdapterView.
         tdgInput.setText(Integer.toString(tdg));
         checkBoxPay.setChecked(pago);
         checkBoxMessageTime.setChecked(mensajeTiempo);
+        checkBoxInitialize.setChecked(inicializar);
+        checkBoxRead.setChecked(lectura);
         checkBoxFormat.setChecked(formatear);
         //---------------------------------------------------------------------------------------------
 
@@ -552,12 +561,30 @@ public class ConfigurationMINI extends AppCompatActivity implements AdapterView.
             }
         });
 
+        checkBoxInitialize.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Boolean desc = checkBoxInitialize.isChecked();
+                config.save(desc, "inicializar", context);
+            }
+        });
+
+        checkBoxRead.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Boolean desc = checkBoxRead.isChecked();
+                config.save(desc, "lectura", context);
+            }
+        });
+
         checkBoxFormat.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                Boolean desc = checkBoxFormat.isChecked();
-                config.save(desc, "formatear", context);
+                Boolean format = checkBoxFormat.isChecked();
+                config.save(format, "formatear", context);
             }
         });
     }

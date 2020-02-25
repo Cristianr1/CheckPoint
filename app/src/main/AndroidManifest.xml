@@ -25,8 +25,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".SplashActivity"
-            android:theme="@style/SplashTheme"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -35,31 +35,41 @@
         </activity>
         <activity
             android:name="com.koiti.checkpoint.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity android:name="com.koiti.checkpoint.Configuration" />
         <activity android:name="com.koiti.checkpoint.ConfigurationMINI" />
         <activity android:name="com.koiti.checkpoint.Password" />
         <activity android:name="com.koiti.checkpoint.Entrance">
             <intent-filter>
-                <action android:name="android.nfc.action.TAG_DISCOVERED"/>
+                <action android:name="android.nfc.action.TAG_DISCOVERED" />
             </intent-filter>
         </activity>
         <activity android:name="com.koiti.checkpoint.Discount">
             <intent-filter>
-                <action android:name="android.nfc.action.TAG_DISCOVERED"/>
+                <action android:name="android.nfc.action.TAG_DISCOVERED" />
             </intent-filter>
         </activity>
-        <activity android:name="com.koiti.checkpoint.Format">
+        <activity android:name="com.koiti.checkpoint.Initialize">
             <intent-filter>
-                <action android:name="android.nfc.action.TAG_DISCOVERED"/>
+                <action android:name="android.nfc.action.TAG_DISCOVERED" />
             </intent-filter>
         </activity>
         <activity android:name="com.koiti.checkpoint.Exit">
             <intent-filter>
-                <action android:name="android.nfc.action.TAG_DISCOVERED"/>
+                <action android:name="android.nfc.action.TAG_DISCOVERED" />
             </intent-filter>
         </activity>
+        <activity android:name="com.koiti.checkpoint.ShowData">
+            <intent-filter>
+                <action android:name="android.nfc.action.TAG_DISCOVERED" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.koiti.checkpoint.Format">
+            <intent-filter>
+                <action android:name="android.nfc.action.TAG_DISCOVERED" />
+            </intent-filter>
+        </activity>
+
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.koiti.checkpoint.fileprovider"
@@ -69,12 +79,16 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
-        <provider android:name="com.koiti.checkpoint.DbProvider"
+        <provider
+            android:name="com.koiti.checkpoint.DbProvider"
             android:authorities="com.jumpmind.symmetric.DbProvider"
             android:exported="false">
             <grant-uri-permission android:pathPattern=".*" />
         </provider>
-        <service android:name="org.jumpmind.symmetric.android.SymmetricService" android:enabled="true" >
+
+        <service
+            android:name="org.jumpmind.symmetric.android.SymmetricService"
+            android:enabled="true">
             <intent-filter>
                 <action android:name="org.jumpmind.symmetric.android.SymmetricService" />
             </intent-filter>

@@ -25,7 +25,7 @@ import es.dmoral.toasty.Toasty;
 /**
  * Initialize the cards that belong to the parking
  */
-public class Format extends AppCompatActivity {
+public class Initialize extends AppCompatActivity {
 
     private Context context;
     private NfcAdapter nfcAdapter;
@@ -41,8 +41,8 @@ public class Format extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_format);
-        setTitle("Formatear");
+        setContentView(R.layout.activity_initialize);
+        setTitle("Inicializar");
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         context = this;
@@ -106,36 +106,57 @@ public class Format extends AppCompatActivity {
                 case Mifare.MIFARE_CONNECTION_SUCCESS:
                     if (mifare.authentificationKey(Mifare.KOITI_KEY1, Mifare.KEY_TYPE_A, 1)) {
 
+                        byte[] datosB1 = mifare.readMifareTagBlock(1, 1);
 
+                        byte[] writeDataB1 = new byte[16];//data that will be written in block 1
                         byte[] writeDataB2 = new byte[16];//data that will be written in block 2
+
+                        int code = config.getValueInt("code", context);
+                        int id = config.getValueInt("id", context);
 
                         //Initialize the arrays
                         for (int i = 0; i < 16; i++) {
+                            writeDataB1[i] = (byte) 0;
                             writeDataB2[i] = (byte) 0;
                         }
 
-                        boolean row0 = mifare.writeMifareTag(1, 0, writeDataB2);
-                        boolean row1 = mifare.writeMifareTag(1, 1, writeDataB2);
-                        boolean row2 = mifare.writeMifareTag(1, 2, writeDataB2);
+                        if (datosB1 != null) {
+                            // evaluate if the card belongs to the parking
+                            if (datosB1[1] == code && datosB1[3] == id) {
+                                writeDataB1[0] = (byte) 1;
+                                writeDataB1[1] = (byte) code;
+                                writeDataB1[3] = (byte) id;
 
-                        if (row0 && row1 && row2) {
-                            final Toast toasty = Toasty.success(Format.this, "" + "Formateo Exitoso", Toast.LENGTH_LONG);
-                            toasty.show();
+                                boolean row0 = mifare.writeMifareTag(1, 0, writeDataB2);
+                                boolean row1 = mifare.writeMifareTag(1, 1, writeDataB1);
+                                boolean row2 = mifare.writeMifareTag(1, 2, writeDataB2);
 
-                            Handler handler = new Handler();
-                            handler.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    toasty.cancel();
-                                }
-                            }, 700);
+                                if (row0 && row1 && row2) {
+                                    final Toast toasty = Toasty.success(Initialize.this, "" + "Escritura Exitosa", Toast.LENGTH_LONG);
+                                    toasty.show();
 
-                            mifare.disconnectTag();
+                                    Handler handler = new Handler();
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            toasty.cancel();
+                                        }
+                                    }, 700);
 
-                        } else
-                            Toasty.error(getBaseContext(), "" + "El formateo " +
-                                    "ha fallado  por favor vuelva a intentarlo.", Toast.LENGTH_LONG).show();
+                                    mifare.disconnectTag();
 
+                                } else
+                                    Toasty.error(getBaseContext(), "" + "La inicialización " +
+                                            "ha fallado  por favor vuelva a intentarlo.", Toast.LENGTH_LONG).show();
+
+                            } else {
+                                Toasty.error(getBaseContext(), "" + "Tarjeta no pertenece al" +
+                                        " parqueadero.", Toast.LENGTH_LONG).show();
+                            }
+                        } else {
+                            Toasty.error(getBaseContext(), "" + "La lectura ha fallado" +
+                                    " por favor vuelva a intentarlo.", Toast.LENGTH_LONG).show();
+                        }
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             save.setBackground(getDrawable(R.drawable.btn_round));//Default Color
                         }
@@ -154,7 +175,7 @@ public class Format extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Intent intent = new Intent(this, Format.class).
+        Intent intent = new Intent(this, Initialize.class).
                 addFlags(Intent.FLAG_RECEIVER_REPLACE_PENDING);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
                 intent, 0);

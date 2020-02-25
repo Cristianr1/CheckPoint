@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ShowData">
+
+
+    <TableLayout
+        android:id="@+id/cardtextFormat"
+        android:layout_width="409dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:stretchColumns="*"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TableRow
+            android:layout_width="0dp"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Cod. Parqueadero:"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/codeParq_Id"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textSize="20sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="0dp"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Id Parqueadero:"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/idParq_Id"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textSize="20sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="0dp"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Clase de tarjeta:"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/classCard_Id"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textSize="20sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="0dp"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Identificación:"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/vehid_Id"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textSize="20sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="0dp"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Fecha de ingreso:"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/dateInput_Id"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textSize="20sp" />
+        </TableRow>
+
+
+        <TableRow
+            android:layout_width="0dp"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Antipassback:"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/apb_Id"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textSize="20sp" />
+        </TableRow>
+
+
+        <TableRow
+            android:layout_width="0dp"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="In Pago:"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/inpay_Id"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textSize="20sp" />
+        </TableRow>
+
+
+        <TableRow
+            android:layout_width="0dp"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Fecha de liquidación:"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/dateLiquidation_Id"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textSize="20sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="0dp"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Fecha max. salida:"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/dateOutput_Id"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textSize="20sp" />
+        </TableRow>
+
+
+        <TableRow
+            android:layout_width="0dp"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Comercio:"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/trade_Id"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textSize="20sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="0dp"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Clase:"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/veh_Id"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textSize="20sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="0dp"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Fecha reg. mensual:"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/dateRegMonthly_Id"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textSize="20sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="0dp">
+
+            <TextView
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Fecha exp. mensual:"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/dateExpMonthly_Id"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textSize="20sp" />
+        </TableRow>
+
+    </TableLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayoutDiscount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cardtextFormat">
+
+        <Button
+            android:id="@+id/read_Id"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginStart="50dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="50dp"
+            android:layout_marginBottom="40dp"
+            android:background="@drawable/btn_round"
+            android:text="leer Tarjeta"
+            android:textColor="#ffffff"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/exitdisc_Id"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="50dp"
+            android:background="@drawable/btn_round"
+            android:text="Salir"
+            android:textColor="#ffffff"
+            android:textSize="20sp" />
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

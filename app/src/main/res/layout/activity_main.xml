@@ -8,6 +8,7 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:orientation="vertical">
 
         <LinearLayout
@@ -29,14 +30,14 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="35dp">
+            android:padding="45dp">
 
             <Button
                 android:id="@+id/in_Id"
                 android:layout_width="match_parent"
                 android:layout_height="65dp"
                 android:layout_marginBottom="20dp"
-                android:background="#1774BD"
+                android:background="@drawable/btn_round"
                 android:text="Entrada"
                 android:textColor="#ffffff"
                 android:textSize="35sp" />
@@ -46,7 +47,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="65dp"
                 android:layout_marginBottom="20dp"
-                android:background="#1774BD"
+                android:background="@drawable/btn_round"
                 android:text="Salida"
                 android:textColor="#ffffff"
                 android:textSize="35dp" />
@@ -56,28 +57,48 @@
                 android:layout_width="match_parent"
                 android:layout_height="65dp"
                 android:layout_marginBottom="20dp"
-                android:background="#1774BD"
+                android:background="@drawable/btn_round"
                 android:text="Descuento"
                 android:textColor="#ffffff"
                 android:textSize="35dp" />
 
 
             <Button
+                android:id="@+id/initialize_Id"
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/btn_round"
+                android:text="Inicializar"
+                android:textColor="#ffffff"
+                android:textSize="35dp" />
+
+            <Button
                 android:id="@+id/format_Id"
                 android:layout_width="match_parent"
                 android:layout_height="65dp"
                 android:layout_marginBottom="20dp"
-                android:background="#1774BD"
-                android:text="Inicializar"
+                android:background="@drawable/btn_round"
+                android:text="Formatear"
                 android:textColor="#ffffff"
                 android:textSize="35dp" />
 
 
             <Button
+                android:id="@+id/showdata_Id"
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/btn_round"
+                android:text="Leer Tarjeta"
+                android:textColor="#ffffff"
+                android:textSize="35dp" />
+
+            <Button
                 android:id="@+id/config_Id"
                 android:layout_width="match_parent"
                 android:layout_height="65dp"
-                android:background="#1774BD"
+                android:background="@drawable/btn_round"
                 android:text="Ajustes"
                 android:textColor="#ffffff"
                 android:textSize="35dp" />
