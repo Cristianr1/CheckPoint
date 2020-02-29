@@ -1,24 +1,27 @@
 package com.koiti.checkpoint;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.net.Uri;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
+import android.os.Build;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.annotation.RequiresApi;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,10 +32,18 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.jumpmind.symmetric.android.SQLiteOpenHelperRegistry;
 
 import android.database.sqlite.SQLiteDatabase;
+
+import com.koiti.checkpoint.MifareThreads.AuthenticationMifare;
+import com.koiti.checkpoint.MifareThreads.Disconnect;
+import com.koiti.checkpoint.MifareThreads.ReadMifare;
+import com.koiti.checkpoint.MifareThreads.WriteMifare;
 
 import es.dmoral.toasty.Toasty;
 
@@ -40,12 +51,13 @@ public class Entrance extends AppCompatActivity {
 
     private Context context;
     private NfcAdapter nfcAdapter;
-    private TextView cardreadershow;
-    private Button car, motorbike, bike, exit;
-    private Boolean active = false, foto = false;
-    private int parameter, code, consecutive, id;
-    private Uri photoURI;
-    String fixed, fixedDateIn, fixedDateOut, currentPhotoPath;
+    private Button car;
+    private Button motorbike;
+    private Button bike;
+    private Boolean active = false, foto = false, placa = false;
+    private int parameter;
+    private Toast toasty;
+    String fixed, fixedDateIn, currentPhotoPath;
 
     ConfigStorage veh = new ConfigStorage();
 
@@ -102,11 +114,10 @@ public class Entrance extends AppCompatActivity {
             }
         }, 10);
 
-        cardreadershow = findViewById(R.id.cardtextview);
         car = findViewById(R.id.car_Id);
         motorbike = findViewById(R.id.motorbike_Id);
         bike = findViewById(R.id.bike_Id);
-        exit = findViewById(R.id.exit_Id);
+        Button exit = findViewById(R.id.exit_Id);
 
         car.setOnClickListener(mListener);
         motorbike.setOnClickListener(mListener);
@@ -117,51 +128,45 @@ public class Entrance extends AppCompatActivity {
         Boolean moto = veh.getValueBoolean("moto", context);
         Boolean bicicleta = veh.getValueBoolean("bicicleta", context);
         foto = veh.getValueBoolean("foto", context);
+        placa = veh.getValueBoolean("placa", context);
 
-        if (!carro) {
-            car.setVisibility(View.GONE);
-        } else {
-            car.setVisibility(View.VISIBLE);
-        }
-
-        if (!moto) {
-            motorbike.setVisibility(View.GONE);
-        } else {
-            motorbike.setVisibility(View.VISIBLE);
-        }
-
-        if (!bicicleta) {
-            bike.setVisibility(View.GONE);
-        } else {
-            bike.setVisibility(View.VISIBLE);
-        }
+        car.setVisibility(carro ? View.VISIBLE : View.GONE);
+        motorbike.setVisibility(moto ? View.VISIBLE : View.GONE);
+        bike.setVisibility(bicicleta ? View.VISIBLE : View.GONE);
     }
 
     private View.OnClickListener mListener = new View.OnClickListener() {
+        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.car_Id:
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        car.setBackground(getDrawable(R.drawable.btn_round_green));//Select Color
+                        motorbike.setBackground(getDrawable(R.drawable.btn_round));//Default Color
+                        bike.setBackground(getDrawable(R.drawable.btn_round));//Default Color
+                    }
                     active = true;
-                    car.setBackgroundColor(Color.parseColor("#02840A"));//Select Color
-                    motorbike.setBackgroundColor(Color.parseColor("#296DBA"));//Default Color
-                    bike.setBackgroundColor(Color.parseColor("#296DBA"));//Default Color
                     parameter = 0;
                     break;
 
                 case R.id.motorbike_Id:
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        car.setBackground(getDrawable(R.drawable.btn_round));//Default Color
+                        motorbike.setBackground(getDrawable(R.drawable.btn_round_green));//Select Color
+                        bike.setBackground(getDrawable(R.drawable.btn_round));//Default Color
+                    }
                     active = true;
-                    car.setBackgroundColor(Color.parseColor("#296DBA"));//Default Color
-                    motorbike.setBackgroundColor(Color.parseColor("#02840A"));//Select Color
-                    bike.setBackgroundColor(Color.parseColor("#296DBA"));//Default Color
                     parameter = 1;
                     break;
 
                 case R.id.bike_Id:
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        car.setBackground(getDrawable(R.drawable.btn_round));//Default Color
+                        motorbike.setBackground(getDrawable(R.drawable.btn_round));//Default Color
+                        bike.setBackground(getDrawable(R.drawable.btn_round_green));//Select Color
+                    }
                     active = true;
-                    car.setBackgroundColor(Color.parseColor("#296DBA"));//Default Color
-                    motorbike.setBackgroundColor(Color.parseColor("#296DBA"));//Default Color
-                    bike.setBackgroundColor(Color.parseColor("#02840A"));//Select Color
                     parameter = 2;
                     break;
 
@@ -172,15 +177,16 @@ public class Entrance extends AppCompatActivity {
         }
     };
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if (!intent.hasExtra(NfcAdapter.EXTRA_TAG)) {
             return;
         }
-        code = config.getValueInt("code", context);
-        id = config.getValueInt("id", context);
-        consecutive = config.getValueInt("consecutive", context);
+        int code = config.getValueInt("code", context);
+        int id = config.getValueInt("id", context);
+        int consecutive = config.getValueInt("consecutive", context);
 
         Toasty.Config.getInstance().setTextSize(24).apply();
 
@@ -205,104 +211,113 @@ public class Entrance extends AppCompatActivity {
             writeDataB0[i] = BDataPark;
         }
 
-        for (int j = dataPark.size(); j < 16; j++) {
+        for (int j = dataPark.size(); j < 16; j++)
             writeDataB0[j] = (byte) 0;
-        }
 
 
         if (active) {
             switch (mifare.connectTag()) {
                 case Mifare.MIFARE_CONNECTION_SUCCESS:
-                    if (mifare.authentificationKey(Mifare.KOITI_KEY1, Mifare.KEY_TYPE_A, 1)) {
-                        byte[] datosB1 = mifare.readMifareTagBlock(1, 1);
-                        byte[] datosB2 = mifare.readMifareTagBlock(1, 2);
+                    ExecutorService service = Executors.newFixedThreadPool(4);
+                    try {
+                        if (service.submit(new AuthenticationMifare(mifare, context)).get()) {
+                            byte[] datosB1 = service.submit(new ReadMifare(mifare, 1)).get();
+                            byte[] datosB2 = service.submit(new ReadMifare(mifare, 2)).get();
 
+                            if (datosB1 != null && datosB2 != null) {
+                                if (datosB1[0] == 1 && datosB1[1] == code && datosB1[3] == id) {
+                                    if (datosB2[10] == 0 || datosB2[10] == 2) {
+                                        byte[] writeData = new byte[16];
 
-                        if (datosB1 != null && datosB2 != null) {
-                            if (datosB1[0] == 1 && datosB1[1] == code && datosB1[3] == id) {
-                                if (datosB2[10] == 0 || datosB2[10] == 2) {
-                                    byte[] writeData = new byte[16];
+                                        System.arraycopy(datosB2, 0, writeData, 0, datosB2.length);//Copia manual del arreglo datosB2 a writeData
 
-                                    System.arraycopy(datosB2, 0, writeData, 0, datosB2.length);//Copia manual del arreglo datosB2 a writeData
+                                        int iyear = Integer.parseInt(DateYear);
+                                        int imonth = Integer.parseInt(DateMonth);
+                                        int iday = Integer.parseInt(DateDay);
+                                        int ihour = Integer.parseInt(DateHour);
+                                        int iminut = Integer.parseInt(DateMinut);
 
-                                    int iyear = Integer.parseInt(DateYear);
-                                    int imonth = Integer.parseInt(DateMonth);
-                                    int iday = Integer.parseInt(DateDay);
-                                    int ihour = Integer.parseInt(DateHour);
-                                    int iminut = Integer.parseInt(DateMinut);
+                                        String sparameter = Integer.toHexString(parameter);
+                                        byte Bparameter = Byte.parseByte(sparameter);
 
-                                    String sparameter = Integer.toHexString(parameter);
-                                    byte Bparameter = Byte.parseByte(sparameter);
+                                        writeData[0] = (byte) iyear;
+                                        writeData[1] = (byte) imonth;
+                                        writeData[2] = (byte) iday;
+                                        writeData[3] = (byte) ihour;
+                                        writeData[4] = (byte) iminut;
+                                        writeData[8] = Bparameter;
+                                        writeData[10] = (byte) 1;
 
-                                    writeData[0] = (byte) iyear;
-                                    writeData[1] = (byte) imonth;
-                                    writeData[2] = (byte) iday;
-                                    writeData[3] = (byte) ihour;
-                                    writeData[4] = (byte) iminut;
-                                    writeData[8] = Bparameter;
-                                    writeData[10] = (byte) 1;
+                                        DecimalFormat formatter = new DecimalFormat("00");
+                                        String read1 = formatter.format(imonth);
+                                        String read2 = formatter.format(iday);
+                                        String read3 = formatter.format(ihour);
+                                        String read4 = formatter.format(iminut);
 
-                                    DecimalFormat formatter = new DecimalFormat("00");
-                                    String read1 = formatter.format(imonth);
-                                    String read2 = formatter.format(iday);
-                                    String read3 = formatter.format(ihour);
-                                    String read4 = formatter.format(iminut);
+                                        fixedDateIn = "20" + iyear + "-" + read1 + "-" + read2 + " " + read3 + ":" + read4;
 
-                                    fixedDateIn = "20" + iyear + "-" + read1 + "-" + read2 + " " + read3 + ":" + read4;
+                                        if (service.submit(new WriteMifare(mifare, writeDataB0, 0)).get()) {
+                                            if (service.submit(new WriteMifare(mifare, writeData, 2)).get()) {
+                                                Toasty.success(Entrance.this, "Escritura Exitosa", Toast.LENGTH_SHORT).show();
 
-                                    boolean row0 = mifare.writeMifareTag(1, 0, writeDataB0);
+                                                int increment = config.getValueInt("consecutive", context);
+                                                int consecutivePicture = config.getValueInt("consecutive", context);
+                                                config.save(++increment, "consecutive", context);
+                                                if (foto && parameter == 2)
+                                                    dispatchTakePictureIntent(consecutivePicture);
 
-                                    if (row0) {
-                                        boolean row2 = mifare.writeMifareTag(1, 2, writeData);
+                                                if (placa && (parameter == 0 || parameter == 1))
+                                                    vehiclePlate(consecutivePicture);
 
-                                        if (row2) {
-                                            Toasty.success(Entrance.this, "Escritura Exitosa", Toast.LENGTH_SHORT).show();
+                                                addData();
+                                            } else {
+                                                byte[] writeDataB2 = new byte[16];
 
-                                            int increment = config.getValueInt("consecutive", context);
-                                            int consecutivePciture = config.getValueInt("consecutive", context);
-                                            config.save(++increment, "consecutive", context);
-                                            if (foto) {
-                                                dispatchTakePictureIntent(consecutivePciture);
+                                                for (int i = 0; i < 16; i++) {
+                                                    writeDataB2[i] = (byte) 0;
+                                                }
+
+                                                mifare.writeMifareTag(1, 0, writeDataB2);
+                                                Toasty.error(Entrance.this, "Grabación Incorrecta", Toast.LENGTH_SHORT).show();
                                             }
-                                            addData();
                                         } else {
-                                            byte[] writeDataB2 = new byte[16];
-
-                                            for (int i = 0; i < 16; i++) {
-                                                writeDataB2[i] = (byte) 0;
-                                            }
-
-                                            mifare.writeMifareTag(1, 0, writeDataB2);
                                             Toasty.error(Entrance.this, "Grabación Incorrecta", Toast.LENGTH_SHORT).show();
+                                            break;
                                         }
                                     } else {
-                                        Toasty.error(Entrance.this, "Grabación Incorrecta", Toast.LENGTH_SHORT).show();
-                                        break;
+                                        Toasty.error(Entrance.this, "La tarjeta no posee salida", Toast.LENGTH_SHORT).show();
                                     }
                                 } else {
-                                    Toasty.error(Entrance.this, "La tarjeta no posee salida", Toast.LENGTH_SHORT).show();
+                                    Toasty.error(getBaseContext(), "" + "Tarjeta no pertenece al" +
+                                            " parqueadero.", Toast.LENGTH_LONG).show();
                                 }
                             } else {
-                                Toasty.error(getBaseContext(), "" + "Tarjeta no pertenece al" +
-                                        " parqueadero.", Toast.LENGTH_LONG).show();
+                                Toasty.error(getBaseContext(), "" + "La lectura ha fallado" +
+                                        " por favor vuelva a intentarlo.", Toast.LENGTH_LONG).show();
                             }
-                            car.setBackgroundColor(Color.parseColor("#296DBA"));//Default Color
-                            motorbike.setBackgroundColor(Color.parseColor("#296DBA"));//Default Color
-                            bike.setBackgroundColor(Color.parseColor("#296DBA"));//Default Color
-                            active = false;
-                        } else {
-                            Toasty.error(getBaseContext(), "" + "La lectura ha fallado" +
-                                    " por favor vuelva a intentarlo.", Toast.LENGTH_LONG).show();
-                        }
 
+                        } else
+                            Toasty.error(getBaseContext(), "Fallo de autentificación", Toast.LENGTH_LONG).show();
 
-                    } else
-                        Toasty.error(getBaseContext(), "Fallo de autentificación", Toast.LENGTH_LONG).show();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    new Thread(new Disconnect(mifare)).start();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        car.setBackground(getDrawable(R.drawable.btn_round));//Default Color
+                        motorbike.setBackground(getDrawable(R.drawable.btn_round));//Default Color
+                        bike.setBackground(getDrawable(R.drawable.btn_round));//Default Color
+                    }
+                    active = false;
                     break;
             }
         } else {
-            Toasty.warning(getBaseContext(), "Recuerde presionar un boton para poder hacer operaciones " +
-                    "en la tarjeta", Toast.LENGTH_LONG).show();
+            toasty = Toasty.warning(getBaseContext(), "Recuerde presionar el boton grabar para poder inicializar " +
+                    "la tarjeta", Toast.LENGTH_LONG);
+            toasty.show();
         }
     }
 
@@ -337,16 +352,12 @@ public class Entrance extends AppCompatActivity {
             }
             // Continue only if the File was successfully created
             if (photoFile != null) {
-                photoURI = FileProvider.getUriForFile(this,
+                Uri photoURI = FileProvider.getUriForFile(this,
                         "com.koiti.checkpoint.fileprovider",
                         photoFile);
 
-                String sconsecutive = Integer.toString(consecutive);
+                veh.save(photoURI.toString(), Integer.toString(consecutive), context);
 
-                SharedPreferences settings = getSharedPreferences("KEY_DATA", 0);
-                SharedPreferences.Editor editor = settings.edit();
-                editor.putString(sconsecutive, photoURI.toString());
-                editor.apply();
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, 1);
             }
@@ -367,6 +378,24 @@ public class Entrance extends AppCompatActivity {
         // Save a file: path for use with ACTION_VIEW intents
         currentPhotoPath = image.getAbsolutePath();
         return image;
+    }
+
+    public void vehiclePlate(final int consecutive) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        final EditText edittext = new EditText(this);
+        alert.setTitle("Digite la placa del vehiculo");
+
+        alert.setView(edittext);
+
+        alert.setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String editTextValue = edittext.getText().toString();
+                config.save(editTextValue, Integer.toString(consecutive), context);
+            }
+        });
+
+        alert.setCancelable(false);
+        alert.show();
     }
 
     public void addData() {

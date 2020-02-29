@@ -4,4 +4,9 @@
         <item>Tiempo</item>
         <item>Porcentaje</item>
     </string-array>
+
+    <string-array name="keys">
+        <item>Llave 1</item>
+        <item>Llave 2</item>
+    </string-array>
 </resources>

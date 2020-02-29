@@ -33,11 +33,11 @@ import java.util.List;
 public class ConfigurationMINI extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private Context context;
     private CheckBox checkBoxEntrada, checkBoxSalida, checkBoxMessageTime, checkBoxDescuento1, checkBoxDescuento2, checkBoxDescuento3, checkBoxCarro, checkBoxMoto, checkBoxBicicleta,
-            checkBoxFoto, checkBoxTdg, checkBoxPay, checkBoxInitialize, checkBoxRead, checkBoxFormat;
+            checkBoxFoto, checkBoxPlaca, checkBoxTdg, checkBoxPay, checkBoxInitialize, checkBoxRead, checkBoxFormat;
     EditText codeInput, idInput, consecutiveInput, tdgInput, ipInput, nodeInput, nodegroupInput, publicadorInput;
     EditText desc1Input, discountValue1Input, desc2Input, discountValue2Input, desc3Input, discountValue3Input;
     EditText discount1Name, discount2Name, discount3Name;
-    Spinner spinnerDiscount1, spinnerDiscount2, spinnerDiscount3;
+    Spinner spinnerDiscount1, spinnerDiscount2, spinnerDiscount3, spinnerKeys;
 
     private String ip = "";
     private String node = "";
@@ -64,6 +64,7 @@ public class ConfigurationMINI extends AppCompatActivity implements AdapterView.
         checkBoxMoto = findViewById(R.id.motoId);
         checkBoxBicicleta = findViewById(R.id.bicicletaId);
         checkBoxFoto = findViewById(R.id.fotoId);
+        checkBoxPlaca = findViewById(R.id.placaId);
 
         checkBoxSalida = findViewById(R.id.salidaId);
         checkBoxTdg = findViewById(R.id.tdgId);
@@ -94,7 +95,7 @@ public class ConfigurationMINI extends AppCompatActivity implements AdapterView.
         publicadorInput = findViewById(R.id.publicadorInput);
 
         checkBoxInitialize = findViewById(R.id.InitializeId);
-        checkBoxRead= findViewById(R.id.ReadCardId);
+        checkBoxRead = findViewById(R.id.ReadCardId);
         checkBoxFormat = findViewById(R.id.FormatId);
 
         Button delete = findViewById(R.id.delete_Id);
@@ -134,6 +135,7 @@ public class ConfigurationMINI extends AppCompatActivity implements AdapterView.
         Boolean moto = config.getValueBoolean("moto", context);
         Boolean bicicleta = config.getValueBoolean("bicicleta", context);
         Boolean foto = config.getValueBoolean("foto", context);
+        Boolean placa = config.getValueBoolean("placa", context);
 
         checkBoxEntrada.setChecked(entrada);
         consecutiveInput.setText(Integer.toString(consecutive));
@@ -141,7 +143,7 @@ public class ConfigurationMINI extends AppCompatActivity implements AdapterView.
         checkBoxMoto.setChecked(moto);
         checkBoxBicicleta.setChecked(bicicleta);
         checkBoxFoto.setChecked(foto);
-
+        checkBoxPlaca.setChecked(placa);
 
         Boolean descuento1 = config.getValueBoolean("discountActive1", context);
         String discountName1 = config.getValueString("discount1name", context);
@@ -209,26 +211,31 @@ public class ConfigurationMINI extends AppCompatActivity implements AdapterView.
         sync.setOnClickListener(mListener);
         out.setOnClickListener(mListener);
 
+        spinnerKeys = findViewById(R.id.keys_spinner);
+        spinnerKeys.setOnItemSelectedListener(this);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapterKeys = ArrayAdapter.createFromResource(this,
+                R.array.keys, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapterKeys.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinnerKeys.setAdapter(adapterKeys);
+        spinnerKeys.setSelection(config.getValueInt("keyMifare", context));
+
         spinnerDiscount1 = findViewById(R.id.spinner_discount1);
         spinnerDiscount1.setOnItemSelectedListener(this);
-        // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapterDiscount1 = ArrayAdapter.createFromResource(this,
                 R.array.type_discount, android.R.layout.simple_spinner_item);
-        // Specify the layout to use when the list of choices appears
         adapterDiscount1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
         spinnerDiscount1.setAdapter(adapterDiscount1);
         spinnerDiscount1.setSelection(config.getValueInt("typeDiscount1", context));
 
 
         spinnerDiscount2 = findViewById(R.id.spinner_discount2);
         spinnerDiscount2.setOnItemSelectedListener(this);
-        // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapterDiscount2 = ArrayAdapter.createFromResource(this,
                 R.array.type_discount, android.R.layout.simple_spinner_item);
-        // Specify the layout to use when the list of choices appears
         adapterDiscount2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
         spinnerDiscount2.setAdapter(adapterDiscount2);
         spinnerDiscount2.setSelection(config.getValueInt("typeDiscount2", context));
 
@@ -490,11 +497,18 @@ public class ConfigurationMINI extends AppCompatActivity implements AdapterView.
         });
 
         checkBoxFoto.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 Boolean foto = checkBoxFoto.isChecked();
                 config.save(foto, "foto", context);
+            }
+        });
+
+        checkBoxPlaca.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Boolean placa = checkBoxPlaca.isChecked();
+                config.save(placa, "placa", context);
             }
         });
 
@@ -599,6 +613,8 @@ public class ConfigurationMINI extends AppCompatActivity implements AdapterView.
             config.save(pos, "typeDiscount2", context);
         else if (spinnerDiscount3.hashCode() == parent.hashCode())
             config.save(pos, "typeDiscount3", context);
+        else
+            config.save(pos, "keyMifare", context);
 
     }
 

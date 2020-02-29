@@ -4,21 +4,32 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
+import android.nfc.tech.MifareClassic;
 import android.os.Build;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.koiti.checkpoint.MifareThreads.AuthenticationMifare;
+import com.koiti.checkpoint.MifareThreads.Disconnect;
+import com.koiti.checkpoint.MifareThreads.ReadMifare;
+import com.koiti.checkpoint.MifareThreads.WriteMifare;
+
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import es.dmoral.toasty.Toasty;
 
@@ -35,6 +46,10 @@ public class Initialize extends AppCompatActivity {
 
     ConfigStorage config = new ConfigStorage();
 
+    private int code, id;
+    byte[] writeDataB1 = new byte[16];//data that will be written in block 1
+    byte[] writeDataB2 = new byte[16];//data that will be written in block 2
+
     Date date = new Date();
     SimpleDateFormat dateIn = new SimpleDateFormat("yyyy-MM-dd  HH:mm");
 
@@ -49,6 +64,15 @@ public class Initialize extends AppCompatActivity {
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        code = config.getValueInt("code", context);
+        id = config.getValueInt("id", context);
+
+
+        for (int i = 0; i < 16; i++) {
+            writeDataB1[i] = (byte) 0;
+            writeDataB2[i] = (byte) 0;
+        }
 
         final TextView textViewDate = findViewById(R.id.date_Id);
 
@@ -104,65 +128,75 @@ public class Initialize extends AppCompatActivity {
         if (active) {
             switch (mifare.connectTag()) {
                 case Mifare.MIFARE_CONNECTION_SUCCESS:
-                    if (mifare.authentificationKey(Mifare.KOITI_KEY1, Mifare.KEY_TYPE_A, 1)) {
+                    ExecutorService service = Executors.newFixedThreadPool(5);
+                    try {
+                        if (service.submit(new AuthenticationMifare(mifare, context)).get()) {
 
-                        byte[] datosB1 = mifare.readMifareTagBlock(1, 1);
+                            Future<byte[]> data = service.submit(new ReadMifare(mifare, 1));
 
-                        byte[] writeDataB1 = new byte[16];//data that will be written in block 1
-                        byte[] writeDataB2 = new byte[16];//data that will be written in block 2
+                            byte[] datosB1 = data.get();
 
-                        int code = config.getValueInt("code", context);
-                        int id = config.getValueInt("id", context);
+                            byte[] writeDataB1 = new byte[16];//data that will be written in block 1
+                            byte[] writeDataB2 = new byte[16];//data that will be written in block 2
 
-                        //Initialize the arrays
-                        for (int i = 0; i < 16; i++) {
-                            writeDataB1[i] = (byte) 0;
-                            writeDataB2[i] = (byte) 0;
-                        }
+                            int code = config.getValueInt("code", context);
+                            int id = config.getValueInt("id", context);
 
-                        if (datosB1 != null) {
-                            // evaluate if the card belongs to the parking
-                            if (datosB1[1] == code && datosB1[3] == id) {
-                                writeDataB1[0] = (byte) 1;
-                                writeDataB1[1] = (byte) code;
-                                writeDataB1[3] = (byte) id;
+                            //Initialize the arrays
+                            for (int i = 0; i < 16; i++) {
+                                writeDataB1[i] = (byte) 0;
+                                writeDataB2[i] = (byte) 0;
+                            }
 
-                                boolean row0 = mifare.writeMifareTag(1, 0, writeDataB2);
-                                boolean row1 = mifare.writeMifareTag(1, 1, writeDataB1);
-                                boolean row2 = mifare.writeMifareTag(1, 2, writeDataB2);
+                            if (datosB1 != null) {
+                                // evaluate if the card belongs to the parking
+                                if (datosB1[1] == code && datosB1[3] == id) {
+                                    writeDataB1[0] = (byte) 1;
+                                    writeDataB1[1] = (byte) code;
+                                    writeDataB1[3] = (byte) id;
 
-                                if (row0 && row1 && row2) {
-                                    final Toast toasty = Toasty.success(Initialize.this, "" + "Escritura Exitosa", Toast.LENGTH_LONG);
-                                    toasty.show();
+                                    Future<Boolean> writeMifare0 = service.submit(new WriteMifare(mifare, writeDataB2, 0));
+                                    Future<Boolean> writeMifare1 = service.submit(new WriteMifare(mifare, writeDataB1, 1));
+                                    Future<Boolean> writeMifare2 = service.submit(new WriteMifare(mifare, writeDataB2, 2));
 
-                                    Handler handler = new Handler();
-                                    handler.postDelayed(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            toasty.cancel();
-                                        }
-                                    }, 700);
 
-                                    mifare.disconnectTag();
+                                    if (writeMifare0.get() && writeMifare1.get() && writeMifare2.get()) {
+                                        final Toast toasty = Toasty.success(Initialize.this, "" + "Escritura Exitosa", Toast.LENGTH_LONG);
+                                        toasty.show();
+
+                                        Handler handler = new Handler();
+                                        handler.postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                toasty.cancel();
+                                            }
+                                        }, 700);
+                                    } else
+                                        Toasty.error(getBaseContext(), "" + "La inicialización " +
+                                                "ha fallado  por favor vuelva a intentarlo.", Toast.LENGTH_LONG).show();
 
                                 } else
-                                    Toasty.error(getBaseContext(), "" + "La inicialización " +
-                                            "ha fallado  por favor vuelva a intentarlo.", Toast.LENGTH_LONG).show();
+                                    Toasty.error(getBaseContext(), "" + "Tarjeta no pertenece al" +
+                                            " parqueadero.", Toast.LENGTH_LONG).show();
+                            } else
+                                Toasty.error(getBaseContext(), "" + "La lectura ha fallado" +
+                                        " por favor vuelva a intentarlo.", Toast.LENGTH_LONG).show();
 
-                            } else {
-                                Toasty.error(getBaseContext(), "" + "Tarjeta no pertenece al" +
-                                        " parqueadero.", Toast.LENGTH_LONG).show();
-                            }
-                        } else {
-                            Toasty.error(getBaseContext(), "" + "La lectura ha fallado" +
-                                    " por favor vuelva a intentarlo.", Toast.LENGTH_LONG).show();
-                        }
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            save.setBackground(getDrawable(R.drawable.btn_round));//Default Color
-                        }
-                        active = false;
-                    } else
-                        Toasty.error(getBaseContext(), "Fallo de autentificación", Toast.LENGTH_LONG).show();
+                        } else
+                            Toasty.error(getBaseContext(), "Fallo de autentificación", Toast.LENGTH_LONG).show();
+
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    service.shutdown();
+
+                    new Thread(new Disconnect(mifare)).start();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        save.setBackground(getDrawable(R.drawable.btn_round));//Default Color
+                    }
+                    active = false;
                     break;
             }
         } else {
@@ -188,5 +222,26 @@ public class Initialize extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         nfcAdapter.disableForegroundDispatch(this);
+    }
+
+    public class Write implements Runnable {
+        private MifareClassic mifareClassic;
+        private int block;
+        private byte[] data;
+
+        Write(MifareClassic mifareClassic, int block, byte[] data) {
+            this.mifareClassic = mifareClassic;
+            this.block = block;
+            this.data = data;
+        }
+
+        @Override
+        public void run() {
+            try {
+                mifareClassic.writeBlock(block, data);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

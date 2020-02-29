@@ -4,26 +4,33 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
+import android.nfc.tech.MifareClassic;
 import android.os.Build;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.koiti.checkpoint.MifareThreads.AuthenticationMifare;
+
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import es.dmoral.toasty.Toasty;
 
 /**
- * Initialize the cards that belong to the parking
+ * Reset a new Mifare card and save the key of accesspar
  */
 public class Format extends AppCompatActivity {
 
@@ -32,10 +39,18 @@ public class Format extends AppCompatActivity {
     private Button save, exit;
     private Boolean active = false;
     private Toast toasty;
+    private byte[] key1 = new byte[]{(byte) 0x33, (byte) 0x56, (byte) 0x30, (byte) 0x70, (byte) 0x34, (byte) 0x72,
+            (byte) 0xFF, 7, (byte) 0x80, (byte) 0x69,
+            (byte) 0x33, (byte) 0x56, (byte) 0x30, (byte) 0x70, (byte) 0x34, (byte) 0x72};
+    private byte[] key2 = new byte[]{(byte) 0x41, (byte) 0x63, (byte) 0x53, (byte) 0x45, (byte) 0x76, (byte) 0x50,
+            (byte) 0xFF, 7, (byte) 0x80, (byte) 0x69,
+            (byte) 0x41, (byte) 0x63, (byte) 0x53, (byte) 0x45, (byte) 0x76, (byte) 0x50};
+    private byte[] standardKey = new byte[]{(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
+            (byte) 0xFF, 7, (byte) 0x80, (byte) 0x69,
+            (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF};
 
     ConfigStorage config = new ConfigStorage();
 
-    Date date = new Date();
     SimpleDateFormat dateIn = new SimpleDateFormat("yyyy-MM-dd  HH:mm");
 
     @Override
@@ -101,24 +116,94 @@ public class Format extends AppCompatActivity {
         Tag nfcTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
         Mifare mifare = new Mifare(nfcTag);
 
+        boolean isAuthenticateSector1 = false, isAuthenticateSector2 = false, isAuthenticateSector3 = false;
+
+        boolean isFormatSector1 = false, isFormatSector2 = false, isFormatSector3 = false;
+
+//        if (active) {
+//            MifareClassic mifareClassic = MifareClassic.get(nfcTag);
+//            try {
+//                mifareClassic.connect();
+//
+//                if (mifareClassic.authenticateSectorWithKeyA(3, key1)) {
+//                    mifareClassic.writeBlock(15, standardKey);
+//                    Log.d("datos", "si");
+//                } else
+//                    Log.d("datos", "no");
+//
+////                for (int i = 1; i < 4; i++) {
+////                    if (mifareClassic.authenticateSectorWithKeyA(i, key1)) {
+////                        mifareClassic.writeBlock((4 * i) + 3, standardKey);
+////                        Log.d("datos", "ok");
+////                    } else {
+////                        if (mifareClassic.authenticateSectorWithKeyA(i, key2)) {
+////                            mifareClassic.writeBlock((4 * i) + 3, standardKey);
+////                            Log.d("datos", "ok2");
+////                        }
+////                    }
+////                }
+//
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        } else {
+//            toasty = Toasty.warning(getBaseContext(), "Recuerde presionar el boton grabar para poder inicializar " +
+//                    "la tarjeta", Toast.LENGTH_LONG);
+//            toasty.show();
+//        }
+
         if (active) {
             switch (mifare.connectTag()) {
                 case Mifare.MIFARE_CONNECTION_SUCCESS:
-                    if (mifare.authentificationKey(Mifare.KOITI_KEY1, Mifare.KEY_TYPE_A, 1)) {
 
+                    ExecutorService service = Executors.newFixedThreadPool(5);
+                    try {
+                        if (service.submit(new AuthenticationMifare(mifare, 1)).get()) {
+                            isAuthenticateSector1 = true;
+                            byte[] writeDataB1 = new byte[16];//data that will be written in block 1
+                            byte[] writeDataB2 = new byte[16];//data that will be written in block 2
 
-                        byte[] writeDataB2 = new byte[16];//data that will be written in block 2
+                            int code = config.getValueInt("code", context);
+                            int id = config.getValueInt("id", context);
 
-                        //Initialize the arrays
-                        for (int i = 0; i < 16; i++) {
-                            writeDataB2[i] = (byte) 0;
+                            //Initialize the arrays
+                            for (int i = 0; i < 16; i++) {
+                                writeDataB1[i] = (byte) 0;
+                                writeDataB2[i] = (byte) 0;
+                            }
+
+                            writeDataB1[0] = (byte) 1;
+                            writeDataB1[1] = (byte) code;
+                            writeDataB1[3] = (byte) id;
+
+                            Log.d("datos", id + "---" + code);
+
+                            boolean row0 = mifare.writeMifareTag(1, 0, writeDataB2);
+                            boolean row1 = mifare.writeMifareTag(1, 1, writeDataB1);
+                            boolean row2 = mifare.writeMifareTag(1, 2, writeDataB2);
+                            boolean s1row3 = mifare.writeMifareTag(1, 3, key1);
+
+                            if (row0 && row1 && row2 && s1row3)
+                                isFormatSector1 = true;
                         }
 
-                        boolean row0 = mifare.writeMifareTag(1, 0, writeDataB2);
-                        boolean row1 = mifare.writeMifareTag(1, 1, writeDataB2);
-                        boolean row2 = mifare.writeMifareTag(1, 2, writeDataB2);
+                        if (service.submit(new AuthenticationMifare(mifare, 2)).get()) {
+                            isAuthenticateSector2 = true;
+                            boolean s2row3 = mifare.writeMifareTag(2, 3, key2);
 
-                        if (row0 && row1 && row2) {
+                            if (s2row3)
+                                isFormatSector2 = true;
+                        }
+
+                        if (service.submit(new AuthenticationMifare(mifare, 3)).get()) {
+                            isAuthenticateSector3 = true;
+                            boolean s3row3 = mifare.writeMifareTag(3, 3, key1);
+
+                            if (s3row3)
+                                isFormatSector3 = true;
+                        }
+
+                        if ((isFormatSector1 && isFormatSector2 && isFormatSector3) || (!isAuthenticateSector1 && !isAuthenticateSector2 && !isAuthenticateSector3)) {
                             final Toast toasty = Toasty.success(Format.this, "" + "Formateo Exitoso", Toast.LENGTH_LONG);
                             toasty.show();
 
@@ -129,19 +214,20 @@ public class Format extends AppCompatActivity {
                                     toasty.cancel();
                                 }
                             }, 700);
+                        } else Toasty.error(getBaseContext(), "" + "El formateo " +
+                                "ha fallado  por favor vuelva a intentarlo.", Toast.LENGTH_LONG).show();
 
-                            mifare.disconnectTag();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    service.shutdown();
 
-                        } else
-                            Toasty.error(getBaseContext(), "" + "El formateo " +
-                                    "ha fallado  por favor vuelva a intentarlo.", Toast.LENGTH_LONG).show();
-
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            save.setBackground(getDrawable(R.drawable.btn_round));//Default Color
-                        }
-                        active = false;
-                    } else
-                        Toasty.error(getBaseContext(), "Fallo de autentificación", Toast.LENGTH_LONG).show();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        save.setBackground(getDrawable(R.drawable.btn_round));//Default Color
+                    }
+                    active = false;
                     break;
             }
         } else {

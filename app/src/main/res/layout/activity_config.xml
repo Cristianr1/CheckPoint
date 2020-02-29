@@ -157,8 +157,8 @@
 
                         <EditText
                             android:id="@+id/discount1_name_Id"
-                            android:inputType="text"
-                            android:hint="Nombre descuento 1"/>
+                            android:hint="Nombre descuento 1"
+                            android:inputType="text" />
 
                     </TableRow>
 
@@ -225,8 +225,8 @@
 
                         <EditText
                             android:id="@+id/discount2_name_Id"
-                            android:inputType="text"
-                            android:hint="Nombre descuento 2"/>
+                            android:hint="Nombre descuento 2"
+                            android:inputType="text" />
 
                     </TableRow>
 
@@ -293,8 +293,8 @@
 
                         <EditText
                             android:id="@+id/discount3_name_Id"
-                            android:inputType="text"
-                            android:hint="Nombre descuento 3"/>
+                            android:hint="Nombre descuento 3"
+                            android:inputType="text" />
 
                     </TableRow>
 
@@ -342,7 +342,6 @@
                     android:textCursorDrawable="@null" />
 
             </LinearLayout>
-
 
 
         </android.support.v7.widget.CardView>
@@ -443,6 +442,17 @@
                     android:scaleX="1.1"
                     android:scaleY="1.1"
                     android:text="Foto"
+                    android:textSize="20sp" />
+
+                <CheckBox
+                    android:id="@+id/placaId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="70dp"
+                    android:layout_marginRight="70dp"
+                    android:scaleX="1.1"
+                    android:scaleY="1.1"
+                    android:text="Placa"
                     android:textSize="20sp" />
 
             </LinearLayout>
@@ -571,11 +581,37 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="30dp"
                     android:layout_marginRight="30dp"
+                    android:layout_marginBottom="10dp"
                     android:scaleX="1.1"
                     android:scaleY="1.1"
                     android:text="Leer Tarjeta"
                     android:textSize="20sp" />
 
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:stretchColumns="*">
+
+                    <TableRow
+                        android:layout_width="0dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:layout_marginBottom="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Llave para autenticación:"
+                            android:textSize="20sp" />
+
+                        <Spinner
+                            android:id="@+id/keys_spinner"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"/>
+                    </TableRow>
+
+                </TableLayout>
 
             </LinearLayout>
 

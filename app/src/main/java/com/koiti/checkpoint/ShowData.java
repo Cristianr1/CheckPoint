@@ -1,10 +1,10 @@
 package com.koiti.checkpoint;
 
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Build;
@@ -18,8 +18,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import com.koiti.checkpoint.MifareThreads.AuthenticationMifare;
+import com.koiti.checkpoint.MifareThreads.Disconnect;
+import com.koiti.checkpoint.MifareThreads.ReadMifare;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import es.dmoral.toasty.Toasty;
 
@@ -78,8 +83,8 @@ public class ShowData extends AppCompatActivity {
                         read.setBackground(getDrawable(R.drawable.btn_round_green));//Select Color
                     }
                     active = true;
-//                    if (toasty != null)
-//                        toasty.cancel();
+                    if (toasty != null)
+                        toasty.cancel();
                     break;
 
                 case R.id.exitdisc_Id:
@@ -90,6 +95,7 @@ public class ShowData extends AppCompatActivity {
     };
 
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -104,82 +110,96 @@ public class ShowData extends AppCompatActivity {
         if (active) {
             switch (mifare.connectTag()) {
                 case Mifare.MIFARE_CONNECTION_SUCCESS:
-                    if (mifare.authentificationKey(Mifare.KOITI_KEY1, Mifare.KEY_TYPE_A, 1)) {
+                    ExecutorService service = Executors.newFixedThreadPool(4);
+                    try {
+                        if (service.submit(new AuthenticationMifare(mifare, context)).get()) {
 
-                        byte[] datosB0 = mifare.readMifareTagBlock(1, 0);
-                        byte[] datosB1 = mifare.readMifareTagBlock(1, 1);
-                        byte[] datosB2 = mifare.readMifareTagBlock(1, 2);
+                            byte[] datosB0 = service.submit(new ReadMifare(mifare, 0)).get();
+                            byte[] datosB1 = service.submit(new ReadMifare(mifare, 1)).get();
+                            byte[] datosB2 = service.submit(new ReadMifare(mifare, 2)).get();
 
-                        int code = config.getValueInt("code", context);
-                        int id = config.getValueInt("id", context);
+                            int code = config.getValueInt("code", context);
+                            int id = config.getValueInt("id", context);
 
-                        if (datosB0 != null && datosB1 != null && datosB2 != null) {
-                            // evaluate if the card belongs to the parking
-                            if (datosB1[1] == code && datosB1[3] == id) {
+                            if (datosB0 != null && datosB1 != null && datosB2 != null) {
+                                // evaluate if the card belongs to the parking
+                                if (datosB1[1] == code && datosB1[3] == id) {
 
-                                String sRead = new String(datosB0);
-                                String fixed = sRead.replaceAll("[^\\x20-\\x7e]", "");
-                                idTV.setText(fixed);
+                                    String sRead = new String(datosB0);
+                                    String fixed = sRead.replaceAll("[^\\x20-\\x7e]", "");
+                                    idTV.setText(fixed);
 
-                                trade.setText(datosB2[5]+"");
-                                codParq.setText(datosB1[1]+"");
-                                idParq.setText(datosB1[3]+"");
-                                dateInput.setText(2000 + datosB2[0] + "-" + datosB2[1] + "-" + datosB2[2] + " " + datosB2[3] + ":" + datosB2[4]);
+                                    trade.setText(datosB2[5] + "");
+                                    codParq.setText(datosB1[1] + "");
+                                    idParq.setText(datosB1[3] + "");
+                                    dateInput.setText(2000 + datosB2[0] + "-" + datosB2[1] + "-" + datosB2[2] + " " + datosB2[3] + ":" + datosB2[4]);
 
-                                String sveh;
-                                if (datosB2[8] == 0)
-                                    sveh = "Carro";
-                                else if (datosB2[8] == 1)
-                                    sveh = "Moto";
-                                else
-                                    sveh = "Bicicleta";
-                                veh.setText(sveh);
+                                    String sveh;
+                                    if (datosB2[8] == 0)
+                                        sveh = "Carro";
+                                    else if (datosB2[8] == 1)
+                                        sveh = "Moto";
+                                    else
+                                        sveh = "Bicicleta";
+                                    veh.setText(sveh);
 
-                                apb.setText((datosB2[10] == 1 ? "In" : "Out"));
-                                dateOutput.setText(2000 + datosB2[11] + "-" + datosB2[12] + "-" + datosB2[13] + " " + datosB2[14] + ":" + datosB2[15]);
-                                classCard.setText("De rotación normal");
-                                inPay.setText(datosB2[9]+"");
-                                dateLiquidation.setText(2000 + datosB1[11] + "-" + datosB1[12] + "-" + datosB1[13] + " " + datosB1[14] + ":" + datosB1[15]);
+                                    String antipassback;
+                                    if (datosB2[10] == 0)
+                                        antipassback = "Inicializado";
+                                    else if (datosB2[10] == 1)
+                                        antipassback = "IN";
+                                    else
+                                        antipassback = "OUT";
+                                    apb.setText(antipassback);
 
-                                String sRegMonthly = datosB1[5] != 0 ? 2000 + datosB1[5] + "-" + datosB1[6] + "-" + datosB1[7] : "Sin fecha";
-                                dateRegMonthly.setText(sRegMonthly);
+                                    dateOutput.setText(2000 + datosB2[11] + "-" + datosB2[12] + "-" + datosB2[13] + " " + datosB2[14] + ":" + datosB2[15]);
+                                    classCard.setText("De rotación normal");
+                                    inPay.setText(datosB2[9] + "");
+                                    dateLiquidation.setText(2000 + datosB1[11] + "-" + datosB1[12] + "-" + datosB1[13] + " " + datosB1[14] + ":" + datosB1[15]);
 
-                                String sExpMonthly = datosB1[8] != 0 ? 2000 + datosB1[8] + "-" + datosB1[9] + "-" + datosB1[10] : "Sin fecha";
-                                dateExpMonthly.setText(sExpMonthly);
+                                    String sRegMonthly = datosB1[5] != 0 ? 2000 + datosB1[5] + "-" + datosB1[6] + "-" + datosB1[7] : "Sin fecha";
+                                    dateRegMonthly.setText(sRegMonthly);
 
-                                final Toast toasty = Toasty.success(ShowData.this, "" + "Lectura Exitosa", Toast.LENGTH_LONG);
-                                toasty.show();
+                                    String sExpMonthly = datosB1[8] != 0 ? 2000 + datosB1[8] + "-" + datosB1[9] + "-" + datosB1[10] : "Sin fecha";
+                                    dateExpMonthly.setText(sExpMonthly);
 
-                                Handler handler = new Handler();
-                                handler.postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        toasty.cancel();
-                                    }
-                                }, 700);
+                                    final Toast toasty = Toasty.success(ShowData.this, "" + "Lectura Exitosa", Toast.LENGTH_LONG);
+                                    toasty.show();
 
-                                mifare.disconnectTag();
+                                    Handler handler = new Handler();
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            toasty.cancel();
+                                        }
+                                    }, 700);
+                                } else
+                                    Toasty.error(getBaseContext(), "" + "Tarjeta no pertenece al" +
+                                            " parqueadero.", Toast.LENGTH_LONG).show();
+                            } else
+                                Toasty.error(getBaseContext(), "" + "La lectura ha fallado" +
+                                        " por favor vuelva a intentarlo.", Toast.LENGTH_LONG).show();
 
-                            } else {
-                                Toasty.error(getBaseContext(), "" + "Tarjeta no pertenece al" +
-                                        " parqueadero.", Toast.LENGTH_LONG).show();
-                            }
-                        } else {
-                            Toasty.error(getBaseContext(), "" + "La lectura ha fallado" +
-                                    " por favor vuelva a intentarlo.", Toast.LENGTH_LONG).show();
-                        }
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            read.setBackground(getDrawable(R.drawable.btn_round));//Default Color
-                        }
-                        active = false;
-                    } else
-                        Toasty.error(getBaseContext(), "Fallo de autentificación", Toast.LENGTH_LONG).show();
+                        } else
+                            Toasty.error(getBaseContext(), "Fallo de autentificación", Toast.LENGTH_LONG).show();
+
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    new Thread(new Disconnect(mifare)).start();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        read.setBackground(getDrawable(R.drawable.btn_round));//Default Color
+                    }
+                    active = false;
                     break;
             }
         } else {
-//            toasty = Toasty.warning(getBaseContext(), "Recuerde presionar el boton grabar para poder inicializar " +
-//                    "la tarjeta", Toast.LENGTH_LONG);
-//            toasty.show();
+            toasty = Toasty.warning(getBaseContext(), "Recuerde presionar el boton grabar para poder inicializar " +
+                    "la tarjeta", Toast.LENGTH_LONG);
+            toasty.show();
         }
     }
 
@@ -200,5 +220,4 @@ public class ShowData extends AppCompatActivity {
         super.onPause();
         nfcAdapter.disableForegroundDispatch(this);
     }
-
 }

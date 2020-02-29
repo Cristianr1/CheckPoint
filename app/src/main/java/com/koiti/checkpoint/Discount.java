@@ -13,7 +13,6 @@ import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -25,7 +24,6 @@ import org.joda.time.Minutes;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Objects;
 
 import es.dmoral.toasty.Toasty;
 
@@ -179,7 +177,7 @@ public class Discount extends AppCompatActivity {
         if (active) {
             switch (mifare.connectTag()) {
                 case Mifare.MIFARE_CONNECTION_SUCCESS:
-                    if (mifare.authentificationKey(Mifare.KOITI_KEY1, Mifare.KEY_TYPE_A, 1)) {
+                    if (mifare.authentificationKey(Mifare.ACCESS_KEY1, Mifare.KEY_TYPE_A, 1)) {
                         byte[] datosB1 = mifare.readMifareTagBlock(1, 1);//read data that that belongs to block 1
                         byte[] datosB2 = mifare.readMifareTagBlock(1, 2);//read data that that belongs to block 2
                         byte[] writeData = new byte[16];
@@ -251,7 +249,8 @@ public class Discount extends AppCompatActivity {
                                                                 }).show();
 
                                                 TextView textView = builder.findViewById(android.R.id.message);
-                                                textView.setTextSize(25);
+                                                if (textView != null) textView.setTextSize(25);
+
                                             }
                                         });
                                     }

@@ -18,17 +18,18 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.joda.time.DateTime;
-import org.joda.time.Minutes;
 import org.jumpmind.symmetric.android.SQLiteOpenHelperRegistry;
 
 import java.text.SimpleDateFormat;
@@ -44,7 +45,7 @@ public class Exit extends AppCompatActivity {
     private NfcAdapter nfcAdapter;
     private TextView cardreadershow;
     private Button save, exit;
-    private Boolean active = false, photo = false, photoCorrect = false;
+    private Boolean active = false, photo = false, photoCorrect = false, plate = false;
     private ImageView imageView, alertView;
     private Uri photoURIG;
     String fixed, fixedDateIn, fixedDateOut, fixedDateNow;
@@ -145,12 +146,13 @@ public class Exit extends AppCompatActivity {
         Boolean tdgcheck = config.getValueBoolean("tdgcheck", context);
         Boolean pay = config.getValueBoolean("pago", context);
         photo = config.getValueBoolean("foto", context);
+        plate = config.getValueBoolean("placa", context);
         int tdg = config.getValueInt("tdg", context);
 
         if (active) {
             switch (mifare.connectTag()) {
                 case Mifare.MIFARE_CONNECTION_SUCCESS:
-                    if (mifare.authentificationKey(Mifare.KOITI_KEY1, Mifare.KEY_TYPE_A, 1)) {
+                    if (mifare.authentificationKey(Mifare.ACCESS_KEY1, Mifare.KEY_TYPE_A, 1)) {
                         byte[] datosB0 = mifare.readMifareTagBlock(1, 0);
                         byte[] datosB1 = mifare.readMifareTagBlock(1, 1);
                         byte[] datosB2 = mifare.readMifareTagBlock(1, 2);
@@ -182,13 +184,11 @@ public class Exit extends AppCompatActivity {
                             DateTime ldtEntrada = new DateTime(datosB2[0] + 2000, datosB2[1], datosB2[2], datosB2[3], datosB2[4]);
                             DateTime ldtActual = new DateTime(iyear, imonth, iday, ihour, iminut);
 
-
                             String sRead = new String(datosB0);
                             fixed = sRead.replaceAll("[^\\x20-\\x7e]", "");
 
                             if (photo && !photoCorrect) {
-                                SharedPreferences settings = getSharedPreferences("KEY_DATA", 0);
-                                String sphoto = settings.getString(fixed, "");
+                                String sphoto = config.getValueString(fixed, context);
                                 photoURIG = Uri.parse(sphoto);
                                 active = false;
 
@@ -215,6 +215,9 @@ public class Exit extends AppCompatActivity {
                                                     if (ldtActual.isBefore(ldtMaxSalida)) {
                                                         boolean row2 = mifare.writeMifareTag(1, 2, writeData);
                                                         if (row2) {
+                                                            if (plate)
+                                                                showPlate(fixed);
+
                                                             Toasty.success(Exit.this, "Escritura Exitosa", Toast.LENGTH_SHORT).show();
                                                             addData();
                                                         } else {
@@ -234,6 +237,9 @@ public class Exit extends AppCompatActivity {
                                                 if (ldtActual.isBefore(tdgEntrada)) {
                                                     boolean row2 = mifare.writeMifareTag(1, 2, writeData);
                                                     if (row2) {
+                                                        if (plate)
+                                                            showPlate(fixed);
+
                                                         Toasty.success(Exit.this, "Escritura Exitosa", Toast.LENGTH_SHORT).show();
                                                         photoCorrect = false;
                                                         addData();
@@ -247,6 +253,9 @@ public class Exit extends AppCompatActivity {
                                         } else {
                                             boolean row2 = mifare.writeMifareTag(1, 2, writeData);
                                             if (row2) {
+                                                if (plate)
+                                                    showPlate(fixed);
+
                                                 Toasty.success(Exit.this, "Escritura Exitosa", Toast.LENGTH_SHORT).show();
                                                 photoCorrect = false;
                                                 addData();
@@ -349,6 +358,22 @@ public class Exit extends AppCompatActivity {
         String updateSentence = "veh_id = " + fixed;
 
         db.update("tb_vehiculos", register, updateSentence, null);
+    }
+
+    public void showPlate(String consecutive) {
+        AlertDialog builder = new AlertDialog.Builder(context).setTitle("Placa del vehiculo")
+                .setMessage(config.getValueString(consecutive, context))
+                .setCancelable(false)
+                .setPositiveButton("OK",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        }).show();
+
+
+        TextView textView = builder.findViewById(android.R.id.message);
+        if (textView != null) textView.setTextSize(25);
     }
 
     public AlertDialog alertaTiempoSalida(int minutosRestantes) {
