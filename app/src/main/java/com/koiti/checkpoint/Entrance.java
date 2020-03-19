@@ -36,6 +36,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.joda.time.DateTime;
 import org.jumpmind.symmetric.android.SQLiteOpenHelperRegistry;
 
 import android.database.sqlite.SQLiteDatabase;
@@ -84,6 +85,8 @@ public class Entrance extends AppCompatActivity {
     SimpleDateFormat sdMinut = new SimpleDateFormat("mm");
     String DateMinut;
 
+    Date ldtActual;
+
     ConfigStorage config = new ConfigStorage();
 
 
@@ -110,6 +113,7 @@ public class Entrance extends AppCompatActivity {
                 DateHour = sdHour.format(new Date());
                 DateMinut = sdMinut.format(new Date());
                 textViewDate.setText(dateIn.format(new Date()));
+                ldtActual = new Date();
                 someHandler.postDelayed(this, 1000);
             }
         }, 10);
@@ -194,6 +198,7 @@ public class Entrance extends AppCompatActivity {
         Mifare mifare = new Mifare(nfcTag);
 
         byte[] writeDataB0 = new byte[16];
+        byte[] writeData = new byte[16];
 
         fixed = Integer.toString(consecutive);
         ArrayList<Integer> dataPark = new ArrayList<>();
@@ -214,6 +219,22 @@ public class Entrance extends AppCompatActivity {
         for (int j = dataPark.size(); j < 16; j++)
             writeDataB0[j] = (byte) 0;
 
+        int iyear = Integer.parseInt(DateYear);
+        int imonth = Integer.parseInt(DateMonth);
+        int iday = Integer.parseInt(DateDay);
+        int ihour = Integer.parseInt(DateHour);
+        int iminut = Integer.parseInt(DateMinut);
+
+        String sparameter = Integer.toHexString(parameter);
+        byte Bparameter = Byte.parseByte(sparameter);
+
+        DecimalFormat formatter = new DecimalFormat("00");
+        String read1 = formatter.format(imonth);
+        String read2 = formatter.format(iday);
+        String read3 = formatter.format(ihour);
+        String read4 = formatter.format(iminut);
+
+        fixedDateIn = "20" + iyear + "-" + read1 + "-" + read2 + " " + read3 + ":" + read4;
 
         if (active) {
             switch (mifare.connectTag()) {
@@ -221,24 +242,15 @@ public class Entrance extends AppCompatActivity {
                     ExecutorService service = Executors.newFixedThreadPool(4);
                     try {
                         if (service.submit(new AuthenticationMifare(mifare, context)).get()) {
+                            byte[] datosB0 = service.submit(new ReadMifare(mifare, 0)).get();
                             byte[] datosB1 = service.submit(new ReadMifare(mifare, 1)).get();
                             byte[] datosB2 = service.submit(new ReadMifare(mifare, 2)).get();
 
                             if (datosB1 != null && datosB2 != null) {
                                 if (datosB1[0] == 1 && datosB1[1] == code && datosB1[3] == id) {
                                     if (datosB2[10] == 0 || datosB2[10] == 2) {
-                                        byte[] writeData = new byte[16];
 
                                         System.arraycopy(datosB2, 0, writeData, 0, datosB2.length);//Copia manual del arreglo datosB2 a writeData
-
-                                        int iyear = Integer.parseInt(DateYear);
-                                        int imonth = Integer.parseInt(DateMonth);
-                                        int iday = Integer.parseInt(DateDay);
-                                        int ihour = Integer.parseInt(DateHour);
-                                        int iminut = Integer.parseInt(DateMinut);
-
-                                        String sparameter = Integer.toHexString(parameter);
-                                        byte Bparameter = Byte.parseByte(sparameter);
 
                                         writeData[0] = (byte) iyear;
                                         writeData[1] = (byte) imonth;
@@ -247,14 +259,6 @@ public class Entrance extends AppCompatActivity {
                                         writeData[4] = (byte) iminut;
                                         writeData[8] = Bparameter;
                                         writeData[10] = (byte) 1;
-
-                                        DecimalFormat formatter = new DecimalFormat("00");
-                                        String read1 = formatter.format(imonth);
-                                        String read2 = formatter.format(iday);
-                                        String read3 = formatter.format(ihour);
-                                        String read4 = formatter.format(iminut);
-
-                                        fixedDateIn = "20" + iyear + "-" + read1 + "-" + read2 + " " + read3 + ":" + read4;
 
                                         if (service.submit(new WriteMifare(mifare, writeDataB0, 0)).get()) {
                                             if (service.submit(new WriteMifare(mifare, writeData, 2)).get()) {
@@ -269,7 +273,7 @@ public class Entrance extends AppCompatActivity {
                                                 if (placa && (parameter == 0 || parameter == 1))
                                                     vehiclePlate(consecutivePicture);
 
-                                                addData();
+                                                addData("Normal");
                                             } else {
                                                 byte[] writeDataB2 = new byte[16];
 
@@ -287,6 +291,32 @@ public class Entrance extends AppCompatActivity {
                                     } else {
                                         Toasty.error(Entrance.this, "La tarjeta no posee salida", Toast.LENGTH_SHORT).show();
                                     }
+                                } else if (datosB1[0] == 2 && datosB1[1] == code && datosB1[3] == id) {
+                                    Date ldtExpMensual = new Date(datosB2[8] + 2000, datosB2[9], datosB2[10]);
+                                    if (ldtActual.before(ldtExpMensual)) {
+                                        System.arraycopy(datosB1, 0, writeData, 0, datosB2.length);//Copia manual del arreglo datosB2 a writeData
+
+                                        writeData[0] = (byte) iyear;
+                                        writeData[1] = (byte) imonth;
+                                        writeData[2] = (byte) iday;
+                                        writeData[3] = (byte) ihour;
+                                        writeData[4] = (byte) iminut;
+                                        writeData[8] = Bparameter;
+                                        writeData[10] = (byte) 1;
+
+                                        String sRead = new String(datosB0);
+                                        fixed = sRead.replaceAll("[^\\x20-\\x7e]", "");
+
+                                        if (service.submit(new WriteMifare(mifare, writeData, 2)).get()) {
+                                            Toasty.success(Entrance.this, "Escritura Exitosa", Toast.LENGTH_SHORT).show();
+
+
+                                            addData("Mensual");
+                                        }else
+                                            Toasty.error(Entrance.this, "Grabación Incorrecta", Toast.LENGTH_SHORT).show();
+                                    } else
+                                        Toasty.error(Entrance.this, "Mensualidad vencida", Toast.LENGTH_SHORT).show();
+
                                 } else {
                                     Toasty.error(getBaseContext(), "" + "Tarjeta no pertenece al" +
                                             " parqueadero.", Toast.LENGTH_LONG).show();
@@ -398,7 +428,7 @@ public class Entrance extends AppCompatActivity {
         alert.show();
     }
 
-    public void addData() {
+    public void addData(String veh_tipo) {
         String tipo;
         if (parameter == 0) {
             tipo = "Carro";
@@ -415,7 +445,7 @@ public class Entrance extends AppCompatActivity {
         register.put("veh_fh_entrada", fixedDateIn);
         register.put("veh_estacion", "MOVIL");
         register.put("veh_usuario", "SISTEMA");
-        register.put("veh_tipo", "Normal");
+        register.put("veh_tipo", veh_tipo);
         register.put("veh_dir_entrada", "1");
         register.put("veh_fe_entrada", fixedDateIn);
         register.put("veh_clase", tipo);

@@ -603,7 +603,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="Llave para autenticación:"
-                            android:textSize="20sp" />
+                            android:textSize="18sp" />
 
                         <Spinner
                             android:id="@+id/keys_spinner"

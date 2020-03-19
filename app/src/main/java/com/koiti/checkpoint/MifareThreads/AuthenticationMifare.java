@@ -1,7 +1,6 @@
 package com.koiti.checkpoint.MifareThreads;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.koiti.checkpoint.ConfigStorage;
 import com.koiti.checkpoint.Mifare;
@@ -18,8 +17,8 @@ public class AuthenticationMifare implements Callable<Boolean> {
         sector = 1;
         ConfigStorage config = new ConfigStorage();
         int numberKey = config.getValueInt("keyMifare", context);
-        if (numberKey == 0) this.key = Mifare.ACCESS_KEY1;
-        else this.key = Mifare.ACCESS_KEY2;
+        if (numberKey == 0) this.key = Mifare.oldKeys[0];
+        else this.key = Mifare.newKeys[0];
     }
 
     public AuthenticationMifare(Mifare mifare, int sector) {

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
-import android.nfc.tech.MifareClassic;
 import android.os.Build;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -18,36 +17,28 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.koiti.checkpoint.MifareThreads.AuthenticationMifare;
+import com.koiti.checkpoint.MifareThreads.FormatSector1;
+import com.koiti.checkpoint.MifareThreads.FormatSector2;
+import com.koiti.checkpoint.MifareThreads.FormatSector3;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import es.dmoral.toasty.Toasty;
 
+
 /**
- * Reset a new Mifare card and save the key of accesspar
+ * Reset mifareclassic 1K card and save a new key in sector 1, 2 and 3.
  */
 public class Format extends AppCompatActivity {
 
     private Context context;
     private NfcAdapter nfcAdapter;
-    private Button save, exit;
+    private Button save;
     private Boolean active = false;
     private Toast toasty;
-    private byte[] key1 = new byte[]{(byte) 0x33, (byte) 0x56, (byte) 0x30, (byte) 0x70, (byte) 0x34, (byte) 0x72,
-            (byte) 0xFF, 7, (byte) 0x80, (byte) 0x69,
-            (byte) 0x33, (byte) 0x56, (byte) 0x30, (byte) 0x70, (byte) 0x34, (byte) 0x72};
-    private byte[] key2 = new byte[]{(byte) 0x41, (byte) 0x63, (byte) 0x53, (byte) 0x45, (byte) 0x76, (byte) 0x50,
-            (byte) 0xFF, 7, (byte) 0x80, (byte) 0x69,
-            (byte) 0x41, (byte) 0x63, (byte) 0x53, (byte) 0x45, (byte) 0x76, (byte) 0x50};
-    private byte[] standardKey = new byte[]{(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
-            (byte) 0xFF, 7, (byte) 0x80, (byte) 0x69,
-            (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF};
+    private int numberKey, code, id;
+    private byte[] authenticationKey, keyFormat1, keyFormat2;
 
     ConfigStorage config = new ConfigStorage();
 
@@ -77,8 +68,20 @@ public class Format extends AppCompatActivity {
             }
         }, 10);
 
+        numberKey = config.getValueInt("keyMifare", context);
+        code = config.getValueInt("code", context);
+        id = config.getValueInt("id", context);
+
+        if (numberKey == 0) {
+            keyFormat1 = Keys.OLD_KEYS_FORMAT[0];
+            keyFormat2 = Keys.OLD_KEYS_FORMAT[1];
+        } else{
+            keyFormat1 = Keys.NEW_KEYS_FORMAT[0];
+            keyFormat2 = Keys.NEW_KEYS_FORMAT[1];
+        }
+
         save = findViewById(R.id.savedisc_Id);
-        exit = findViewById(R.id.exitdisc_Id);
+        Button exit = findViewById(R.id.exitdisc_Id);
 
         save.setOnClickListener(mListener);
         exit.setOnClickListener(mListener);
@@ -114,126 +117,100 @@ public class Format extends AppCompatActivity {
         Toasty.Config.getInstance().setTextSize(24).apply();
 
         Tag nfcTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-        Mifare mifare = new Mifare(nfcTag);
 
-        boolean isAuthenticateSector1 = false, isAuthenticateSector2 = false, isAuthenticateSector3 = false;
-
-        boolean isFormatSector1 = false, isFormatSector2 = false, isFormatSector3 = false;
-
-//        if (active) {
-//            MifareClassic mifareClassic = MifareClassic.get(nfcTag);
-//            try {
-//                mifareClassic.connect();
-//
-//                if (mifareClassic.authenticateSectorWithKeyA(3, key1)) {
-//                    mifareClassic.writeBlock(15, standardKey);
-//                    Log.d("datos", "si");
-//                } else
-//                    Log.d("datos", "no");
-//
-////                for (int i = 1; i < 4; i++) {
-////                    if (mifareClassic.authenticateSectorWithKeyA(i, key1)) {
-////                        mifareClassic.writeBlock((4 * i) + 3, standardKey);
-////                        Log.d("datos", "ok");
-////                    } else {
-////                        if (mifareClassic.authenticateSectorWithKeyA(i, key2)) {
-////                            mifareClassic.writeBlock((4 * i) + 3, standardKey);
-////                            Log.d("datos", "ok2");
-////                        }
-////                    }
-////                }
-//
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        } else {
-//            toasty = Toasty.warning(getBaseContext(), "Recuerde presionar el boton grabar para poder inicializar " +
-//                    "la tarjeta", Toast.LENGTH_LONG);
-//            toasty.show();
-//        }
+        boolean isAuthenticatedSector1, isAuthenticatedSector2, isAuthenticatedSector3;
 
         if (active) {
-            switch (mifare.connectTag()) {
-                case Mifare.MIFARE_CONNECTION_SUCCESS:
-
-                    ExecutorService service = Executors.newFixedThreadPool(5);
-                    try {
-                        if (service.submit(new AuthenticationMifare(mifare, 1)).get()) {
-                            isAuthenticateSector1 = true;
-                            byte[] writeDataB1 = new byte[16];//data that will be written in block 1
-                            byte[] writeDataB2 = new byte[16];//data that will be written in block 2
-
-                            int code = config.getValueInt("code", context);
-                            int id = config.getValueInt("id", context);
-
-                            //Initialize the arrays
-                            for (int i = 0; i < 16; i++) {
-                                writeDataB1[i] = (byte) 0;
-                                writeDataB2[i] = (byte) 0;
-                            }
-
-                            writeDataB1[0] = (byte) 1;
-                            writeDataB1[1] = (byte) code;
-                            writeDataB1[3] = (byte) id;
-
-                            Log.d("datos", id + "---" + code);
-
-                            boolean row0 = mifare.writeMifareTag(1, 0, writeDataB2);
-                            boolean row1 = mifare.writeMifareTag(1, 1, writeDataB1);
-                            boolean row2 = mifare.writeMifareTag(1, 2, writeDataB2);
-                            boolean s1row3 = mifare.writeMifareTag(1, 3, key1);
-
-                            if (row0 && row1 && row2 && s1row3)
-                                isFormatSector1 = true;
-                        }
-
-                        if (service.submit(new AuthenticationMifare(mifare, 2)).get()) {
-                            isAuthenticateSector2 = true;
-                            boolean s2row3 = mifare.writeMifareTag(2, 3, key2);
-
-                            if (s2row3)
-                                isFormatSector2 = true;
-                        }
-
-                        if (service.submit(new AuthenticationMifare(mifare, 3)).get()) {
-                            isAuthenticateSector3 = true;
-                            boolean s3row3 = mifare.writeMifareTag(3, 3, key1);
-
-                            if (s3row3)
-                                isFormatSector3 = true;
-                        }
-
-                        if ((isFormatSector1 && isFormatSector2 && isFormatSector3) || (!isAuthenticateSector1 && !isAuthenticateSector2 && !isAuthenticateSector3)) {
-                            final Toast toasty = Toasty.success(Format.this, "" + "Formateo Exitoso", Toast.LENGTH_LONG);
-                            toasty.show();
-
-                            Handler handler = new Handler();
-                            handler.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    toasty.cancel();
-                                }
-                            }, 700);
-                        } else Toasty.error(getBaseContext(), "" + "El formateo " +
-                                "ha fallado  por favor vuelva a intentarlo.", Toast.LENGTH_LONG).show();
-
-                    } catch (ExecutionException e) {
-                        e.printStackTrace();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    service.shutdown();
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        save.setBackground(getDrawable(R.drawable.btn_round));//Default Color
-                    }
-                    active = false;
-                    break;
+            FormatSector1 formatSector1 = new FormatSector1(nfcTag, Keys.STANDAR_KEY, code, id, keyFormat1);
+            Thread t1 = new Thread(formatSector1, "T1");
+            t1.start();
+            try {
+                t1.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        } else {
-            toasty = Toasty.warning(getBaseContext(), "Recuerde presionar el boton grabar para poder inicializar " +
-                    "la tarjeta", Toast.LENGTH_LONG);
-            toasty.show();
+            isAuthenticatedSector1 = formatSector1.getAuthenticated();
+
+            if (!isAuthenticatedSector1 && numberKey == 1) {
+                formatSector1 = new FormatSector1(nfcTag, Keys.OLD_KEYS[0], code, id, keyFormat1);
+                t1 = new Thread(formatSector1, "T1");
+                t1.start();
+                try {
+                    t1.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                isAuthenticatedSector1 = formatSector1.getAuthenticated();
+            }
+
+            Log.d("datos", "1" + isAuthenticatedSector1);
+
+            //-----------------------------------------------------------------------------------------------------------------------
+
+            FormatSector2 formatSector2 = new FormatSector2(nfcTag, Keys.STANDAR_KEY, keyFormat2);
+            Thread t2 = new Thread(formatSector2, "T2");
+            t2.start();
+            try {
+                t2.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            isAuthenticatedSector2 = formatSector2.getAuthenticated();
+
+            if (!isAuthenticatedSector2 && numberKey == 1) {
+                formatSector2 = new FormatSector2(nfcTag, Keys.OLD_KEYS[1], keyFormat2);
+                t2 = new Thread(formatSector2, "T2");
+                t2.start();
+                try {
+                    t2.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                isAuthenticatedSector2 = formatSector2.getAuthenticated();
+            }
+
+            Log.d("datos", "2" + isAuthenticatedSector2);
+
+            //-----------------------------------------------------------------------------------------------------------------------
+
+            FormatSector3 formatSector3 = new FormatSector3(nfcTag, Keys.STANDAR_KEY, keyFormat1);
+            Thread t3 = new Thread(formatSector3, "T3");
+            t3.start();
+            try {
+                t3.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            isAuthenticatedSector3 = formatSector3.getAuthenticated();
+
+            if (!isAuthenticatedSector3 && numberKey == 1) {
+                formatSector3 = new FormatSector3(nfcTag, Keys.OLD_KEYS[0], keyFormat1);
+                t3 = new Thread(formatSector3, "T3");
+                t3.start();
+                try {
+                    t3.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                isAuthenticatedSector3 = formatSector3.getAuthenticated();
+            }
+
+            Log.d("datos", "3" + isAuthenticatedSector3);
+
+            //-----------------------------------------------------------------------------------------------------------------------
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                save.setBackground(getDrawable(R.drawable.btn_round));//Default Color
+            }
+
+            if ((isAuthenticatedSector1 && isAuthenticatedSector2 && isAuthenticatedSector3)) {
+                final Toast toasty = Toasty.success(Format.this, "" + "Formateo Exitoso", Toast.LENGTH_LONG);
+                toasty.show();
+
+            } else Toasty.error(getBaseContext(), "" + "El formateo " +
+                    "ha fallado  por favor vuelva a intentarlo.", Toast.LENGTH_LONG).show();
+
+            active = false;
         }
     }
 

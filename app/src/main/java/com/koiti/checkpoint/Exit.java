@@ -56,7 +56,6 @@ public class Exit extends AppCompatActivity {
     SimpleDateFormat dateOut = new SimpleDateFormat("yyyy-MM-dd HH:mm");
     String DateOut;
 
-
     SimpleDateFormat sdYear = new SimpleDateFormat("yyyy");
     String DateYear;
 

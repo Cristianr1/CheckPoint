@@ -6,7 +6,7 @@
     </string-array>
 
     <string-array name="keys">
-        <item>Llave 1</item>
-        <item>Llave 2</item>
+        <item>Llave Antigua</item>
+        <item>Llave Nueva</item>
     </string-array>
 </resources>

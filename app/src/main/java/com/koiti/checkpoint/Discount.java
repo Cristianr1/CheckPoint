@@ -323,7 +323,7 @@ public class Discount extends AppCompatActivity {
                 discountValue = 0;
             } else if (discountValue > 255 && discountValue < 2047) {
                 if (discountValue < 512) inpago = 19; //10011
-                if (discountValue > 767 && discountValue < 1024) inpago = 23;//10011
+                if (discountValue > 767 && discountValue < 1024) inpago = 23;//10111
                 if (discountValue >= 1024) inpago = 25;//11001
             } else {
                 inpago = 17; //10001

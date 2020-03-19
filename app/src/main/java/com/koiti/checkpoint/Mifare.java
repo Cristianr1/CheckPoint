@@ -19,6 +19,33 @@ public class Mifare {
     public static final byte[] ACCESS_KEY1 = new byte[]{(byte) 0x33, (byte) 0x56, (byte) 0x30, (byte) 0x70, (byte) 0x34, (byte) 0x72};//3V0p4r
     public static final byte[] ACCESS_KEY2 = new byte[]{(byte) 0x41, (byte) 0x63, (byte) 0x53, (byte) 0x45, (byte) 0x76, (byte) 0x50};//AcSEvP
 
+    private byte[][] oldKeysFormat = {{(byte) 0x33, (byte) 0x56, (byte) 0x30, (byte) 0x70, (byte) 0x34, (byte) 0x72,
+            (byte) 0xFF, 7, (byte) 0x80, (byte) 0x69,
+            (byte) 0x33, (byte) 0x56, (byte) 0x30, (byte) 0x70, (byte) 0x34, (byte) 0x72},
+
+            {(byte) 0x41, (byte) 0x63, (byte) 0x53, (byte) 0x45, (byte) 0x76, (byte) 0x50,
+                    (byte) 0xFF, 7, (byte) 0x80, (byte) 0x69,
+                    (byte) 0x41, (byte) 0x63, (byte) 0x53, (byte) 0x45, (byte) 0x76, (byte) 0x50}};
+
+
+    public static final byte[][] newKeysFormat = {{(byte) 0x4E, (byte) 0x65, (byte) 0x77, (byte) 0x50, (byte) 0x4C, (byte) 0x31,
+            (byte) 0xFF, 7, (byte) 0x80, (byte) 0x69,
+            (byte) 0x4E, (byte) 0x65, (byte) 0x77, (byte) 0x50, (byte) 0x4C, (byte) 0x31},
+
+            {(byte) 0x4E, (byte) 0x65, (byte) 0x77, (byte) 0x50, (byte) 0x4C, (byte) 0x32,
+                    (byte) 0xFF, 7, (byte) 0x80, (byte) 0x69,
+                    (byte) 0x4E, (byte) 0x65, (byte) 0x77, (byte) 0x50, (byte) 0x4C, (byte) 0x32}};
+
+    public static final byte[][] newKeys = {
+            {(byte) 0x4E, (byte) 0x65, (byte) 0x77, (byte) 0x50, (byte) 0x4C, (byte) 0x31},
+            {(byte) 0x4E, (byte) 0x65, (byte) 0x77, (byte) 0x50, (byte) 0x4C, (byte) 0x32}
+    };
+
+    public static final byte[][] oldKeys = {
+            {(byte) 0x33, (byte) 0x56, (byte) 0x30, (byte) 0x70, (byte) 0x34, (byte) 0x72},//3V0p4r
+            {(byte) 0x41, (byte) 0x63, (byte) 0x53, (byte) 0x45, (byte) 0x76, (byte) 0x50}//AcSEvP
+    };
+
     private Tag nTag;
     private MifareClassic mifareClassic;
 
