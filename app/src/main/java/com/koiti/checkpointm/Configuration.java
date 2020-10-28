@@ -1,4 +1,4 @@
-package com.koiti.checkpoint;
+package com.koiti.checkpointm;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -332,7 +332,7 @@ public class Configuration extends AppCompatActivity implements AdapterView.OnIt
 
         config.save(url, "url", context);
 
-        SQLiteDatabase db = SQLiteOpenHelperRegistry.lookup(DbProvider.DATABASE_NAME).getWritableDatabase();
+        SQLiteDatabase db = SQLiteOpenHelperRegistry.lookup(DbProviderM.DATABASE_NAME).getWritableDatabase();
 
         Cursor c = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
         List<String> tablas = new ArrayList<>();
@@ -344,6 +344,7 @@ public class Configuration extends AppCompatActivity implements AdapterView.OnIt
         tablas.remove("sqlite_sequence");
         tablas.remove("android_metadata");
         tablas.remove("tb_vehiculos");
+        tablas.remove("tb_mensuales");
 
         c.close();
 
@@ -496,7 +497,7 @@ public class Configuration extends AppCompatActivity implements AdapterView.OnIt
     public AlertDialog alert() {
         AlertDialog.Builder builder = new AlertDialog.Builder(Configuration.this);
 
-        final SQLiteDatabase db = SQLiteOpenHelperRegistry.lookup(DbProvider.DATABASE_NAME).getWritableDatabase();
+        final SQLiteDatabase db = SQLiteOpenHelperRegistry.lookup(DbProviderM.DATABASE_NAME).getWritableDatabase();
 
 
         builder.setTitle("Advertencia")

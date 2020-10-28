@@ -1,4 +1,4 @@
-package com.koiti.checkpoint;
+package com.koiti.checkpointm;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;

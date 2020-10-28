@@ -1,4 +1,4 @@
-package com.koiti.checkpoint;
+package com.koiti.checkpointm;
 
 import android.app.PendingIntent;
 import android.content.ContentValues;
@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.net.Uri;
@@ -18,13 +17,10 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Editable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -148,6 +144,8 @@ public class Exit extends AppCompatActivity {
         plate = config.getValueBoolean("placa", context);
         int tdg = config.getValueInt("tdg", context);
 
+        StringBuilder sbUid = new StringBuilder();
+
         if (active) {
             switch (mifare.connectTag()) {
                 case Mifare.MIFARE_CONNECTION_SUCCESS:
@@ -158,13 +156,13 @@ public class Exit extends AppCompatActivity {
                         byte[] writeData = new byte[16];
 
                         if (datosB0 != null && datosB1 != null && datosB2 != null) {
-
-                            if (datosB0[0] == 0 && datosB0[1] == 0) {
-                                Toasty.error(getBaseContext(), "Tarjeta no posee ingreso", Toast.LENGTH_LONG).show();
-                                save.setBackgroundColor(Color.parseColor("#296DBA"));//Default Color
-                                active = false;
-                                break;
-                            }
+//
+//                            if (datosB0[0] == 0 && datosB0[1] == 0) {
+//                                Toasty.error(getBaseContext(), "Tarjeta no posee ingreso", Toast.LENGTH_LONG).show();
+//                                save.setBackgroundColor(Color.parseColor("#296DBA"));//Default Color
+//                                active = false;
+//                                break;
+//                            }
 
                             System.arraycopy(datosB2, 0, writeData, 0, datosB2.length);//Copia manual del arreglo datosB2 a writeData
 
@@ -202,69 +200,41 @@ public class Exit extends AppCompatActivity {
                             }
 
                             if (photoCorrect) {
-                                if (datosB1[0] == 1 && datosB1[1] == code && datosB1[3] == id) {
+                                if (datosB1[1] == code && datosB1[3] == id) {
                                     if (datosB2[10] == 0 || datosB2[10] == 1) {
-                                        if (!pay) {
-                                            if (!tdgcheck) {
-
-                                                if (datosB2[11] != 0 && datosB2[12] != 0 && datosB2[13] != 0) {
-//                                                    LocalDateTime ldtMaxSalida = LocalDateTime.of(datosB2[11] + 2000, datosB2[12], datosB2[13], datosB2[14], datosB2[15]);
-                                                    DateTime ldtMaxSalida = new DateTime(datosB2[11] + 2000, datosB2[12], datosB2[13], datosB2[14], datosB2[15]);
-
-                                                    if (ldtActual.isBefore(ldtMaxSalida)) {
-                                                        boolean row2 = mifare.writeMifareTag(1, 2, writeData);
-                                                        if (row2) {
-                                                            if (plate)
-                                                                showPlate(fixed);
-
-                                                            Toasty.success(Exit.this, "Escritura Exitosa", Toast.LENGTH_SHORT).show();
-                                                            addData();
-                                                        } else {
-                                                            Toasty.error(Exit.this, "Grabación Incorrecta", Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    } else {
-                                                        Toasty.error(getBaseContext(), "La fecha de salida es menor que la fecha" +
-                                                                " actual \n" + fixedDateOut, Toast.LENGTH_LONG).show();
-                                                    }
-                                                } else {
-                                                    Toasty.error(getBaseContext(), "No registra pago", Toast.LENGTH_LONG).show();
-                                                }
-                                            } else {
-//                                                LocalDateTime tdgEntrada = ldtEntrada.plusMinutes(tdg);
-                                                DateTime tdgEntrada = ldtEntrada.plusMinutes(tdg);
-
-                                                if (ldtActual.isBefore(tdgEntrada)) {
-                                                    boolean row2 = mifare.writeMifareTag(1, 2, writeData);
-                                                    if (row2) {
-                                                        if (plate)
-                                                            showPlate(fixed);
-
-                                                        Toasty.success(Exit.this, "Escritura Exitosa", Toast.LENGTH_SHORT).show();
-                                                        photoCorrect = false;
-                                                        addData();
-                                                    } else {
-                                                        Toasty.error(Exit.this, "Grabación Incorrecta", Toast.LENGTH_SHORT).show();
-                                                    }
-                                                } else {
-                                                    Toasty.error(getBaseContext(), "Excede tiempo de gracia", Toast.LENGTH_LONG).show();
-                                                }
+                                        byte[] uid = mifare.getUid();
+                                        for (int i = uid.length - 1; i >= 0; i--) {
+                                            if (i < 2) {
+                                                String sUid = String.format("%02X", uid[i] & 0xFF);
+                                                sbUid.append(sUid);
                                             }
-                                        } else {
+                                        }
+                                        int uidDecimal = Integer.parseInt(sbUid.toString(), 16);
+
+                                        String dateIn = "20" + datosB2[0] + "-" + datosB2[1] + "-" + datosB2[2] + " " + datosB2[3] + ":" + datosB2[4];
+
+                                        if (pay) {
                                             boolean row2 = mifare.writeMifareTag(1, 2, writeData);
                                             if (row2) {
                                                 if (plate)
                                                     showPlate(fixed);
+                                                UploadData uploadData = new UploadData(context, uidDecimal, dateIn, DateOut, false);
+                                                new Thread(uploadData).start();
 
                                                 Toasty.success(Exit.this, "Escritura Exitosa", Toast.LENGTH_SHORT).show();
                                                 photoCorrect = false;
-                                                addData();
+                                                addData(uidDecimal);
                                             } else {
                                                 Toasty.error(Exit.this, "Grabación Incorrecta", Toast.LENGTH_SHORT).show();
                                             }
+                                        } else {
+                                            Toasty.error(Exit.this, "Tarjeta no posee pago", Toast.LENGTH_SHORT).show();
                                         }
                                     } else {
                                         Toasty.error(getBaseContext(), "Tarjeta no posee ingreso", Toast.LENGTH_LONG).show();
                                     }
+                                } else if (datosB1[0] == 1) {
+                                    Toasty.error(getBaseContext(), "Error de estatus: " + datosB1[0], Toast.LENGTH_LONG).show();
                                 } else {
                                     Toasty.error(getBaseContext(), "" + "Tarjeta no pertenece al" +
                                             " parqueadero.", Toast.LENGTH_LONG).show();
@@ -345,8 +315,8 @@ public class Exit extends AppCompatActivity {
         alertDialog.show();
     }
 
-    public void addData() {
-        SQLiteDatabase db = SQLiteOpenHelperRegistry.lookup(DbProvider.DATABASE_NAME).getWritableDatabase();
+    public void addData(int uid) {
+        SQLiteDatabase db = SQLiteOpenHelperRegistry.lookup(DbProviderM.DATABASE_NAME).getWritableDatabase();
 
         ContentValues register = new ContentValues();
 
@@ -354,7 +324,7 @@ public class Exit extends AppCompatActivity {
         register.put("veh_fe_salida", DateOut);
         register.put("veh_dir_salida", "1");
 
-        String updateSentence = "veh_id = " + fixed;
+        String updateSentence = "veh_id = " + uid;
 
         db.update("tb_vehiculos", register, updateSentence, null);
     }
@@ -375,19 +345,5 @@ public class Exit extends AppCompatActivity {
         if (textView != null) textView.setTextSize(25);
     }
 
-    public AlertDialog alertaTiempoSalida(int minutosRestantes) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-
-        builder.setTitle("Tiempo para salir")
-                .setMessage("Quedan " + minutosRestantes + " minutos para salir del parqueadero")
-                .setPositiveButton("OK",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        });
-
-        return builder.create();
-    }
 
 }

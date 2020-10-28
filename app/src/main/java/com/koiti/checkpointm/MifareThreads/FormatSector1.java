@@ -1,4 +1,4 @@
-package com.koiti.checkpoint.MifareThreads;
+package com.koiti.checkpointm.MifareThreads;
 
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;

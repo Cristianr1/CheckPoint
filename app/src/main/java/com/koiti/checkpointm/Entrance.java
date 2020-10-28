@@ -1,4 +1,4 @@
-package com.koiti.checkpoint;
+package com.koiti.checkpointm;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -36,15 +36,16 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.jumpmind.symmetric.android.SQLiteOpenHelperRegistry;
 
 import android.database.sqlite.SQLiteDatabase;
 
-import com.koiti.checkpoint.MifareThreads.AuthenticationMifare;
-import com.koiti.checkpoint.MifareThreads.Disconnect;
-import com.koiti.checkpoint.MifareThreads.ReadMifare;
-import com.koiti.checkpoint.MifareThreads.WriteMifare;
+import com.koiti.checkpointm.MifareThreads.AuthenticationMifare;
+import com.koiti.checkpointm.MifareThreads.Disconnect;
+import com.koiti.checkpointm.MifareThreads.FormatSector1;
+import com.koiti.checkpointm.MifareThreads.ReadMifare;
+import com.koiti.checkpointm.MifareThreads.WriteMifare;
 
 import es.dmoral.toasty.Toasty;
 
@@ -236,6 +237,9 @@ public class Entrance extends AppCompatActivity {
 
         fixedDateIn = "20" + iyear + "-" + read1 + "-" + read2 + " " + read3 + ":" + read4;
 
+        LocalDate currentDate = new LocalDate();
+        StringBuilder sbUid = new StringBuilder();
+
         if (active) {
             switch (mifare.connectTag()) {
                 case Mifare.MIFARE_CONNECTION_SUCCESS:
@@ -247,76 +251,63 @@ public class Entrance extends AppCompatActivity {
                             byte[] datosB2 = service.submit(new ReadMifare(mifare, 2)).get();
 
                             if (datosB1 != null && datosB2 != null) {
-                                if (datosB1[0] == 1 && datosB1[1] == code && datosB1[3] == id) {
+                                if (datosB1[1] == code && datosB1[3] == id) {
                                     if (datosB2[10] == 0 || datosB2[10] == 2) {
-
-                                        System.arraycopy(datosB2, 0, writeData, 0, datosB2.length);//Copia manual del arreglo datosB2 a writeData
-
-                                        writeData[0] = (byte) iyear;
-                                        writeData[1] = (byte) imonth;
-                                        writeData[2] = (byte) iday;
-                                        writeData[3] = (byte) ihour;
-                                        writeData[4] = (byte) iminut;
-                                        writeData[8] = Bparameter;
-                                        writeData[10] = (byte) 1;
-
-                                        if (service.submit(new WriteMifare(mifare, writeDataB0, 0)).get()) {
-                                            if (service.submit(new WriteMifare(mifare, writeData, 2)).get()) {
-                                                Toasty.success(Entrance.this, "Escritura Exitosa", Toast.LENGTH_SHORT).show();
-
-                                                int increment = config.getValueInt("consecutive", context);
-                                                int consecutivePicture = config.getValueInt("consecutive", context);
-                                                config.save(++increment, "consecutive", context);
-                                                if (foto && parameter == 2)
-                                                    dispatchTakePictureIntent(consecutivePicture);
-
-                                                if (placa && (parameter == 0 || parameter == 1))
-                                                    vehiclePlate(consecutivePicture);
-
-                                                addData("Normal");
-                                            } else {
-                                                byte[] writeDataB2 = new byte[16];
-
-                                                for (int i = 0; i < 16; i++) {
-                                                    writeDataB2[i] = (byte) 0;
-                                                }
-
-                                                mifare.writeMifareTag(1, 0, writeDataB2);
-                                                Toasty.error(Entrance.this, "Grabación Incorrecta", Toast.LENGTH_SHORT).show();
+                                        byte[] uid = mifare.getUid();
+                                        for (int i = uid.length - 1; i >= 0; i--) {
+                                            if (i < 2) {
+                                                String sUid = String.format("%02X", uid[i] & 0xFF);
+                                                sbUid.append(sUid);
                                             }
+                                        }
+                                        int uidDecimal = Integer.parseInt(sbUid.toString(), 16);
+                                        Mensual mensual = new Mensual(uidDecimal, currentDate);
+                                        if (!mensual.dateUntil()) {
+                                            System.arraycopy(datosB2, 0, writeData, 0, datosB2.length);//Copia manual del arreglo datosB2 a writeData
+
+                                            writeData[0] = (byte) iyear;
+                                            writeData[1] = (byte) imonth;
+                                            writeData[2] = (byte) iday;
+                                            writeData[3] = (byte) ihour;
+                                            writeData[4] = (byte) iminut;
+                                            writeData[8] = Bparameter;
+                                            writeData[10] = (byte) 1;
+
+                                            if (service.submit(new WriteMifare(mifare, writeDataB0, 0)).get()) {
+                                                if (service.submit(new WriteMifare(mifare, writeData, 2)).get()) {
+                                                    Toasty.success(Entrance.this, "Escritura Exitosa", Toast.LENGTH_SHORT).show();
+                                                    int increment = config.getValueInt("consecutive", context);
+                                                    int consecutivePicture = config.getValueInt("consecutive", context);
+                                                    config.save(++increment, "consecutive", context);
+                                                    if (foto && parameter == 2)
+                                                        dispatchTakePictureIntent(consecutivePicture);
+
+                                                    if (placa && (parameter == 0 || parameter == 1))
+                                                        vehiclePlate(consecutivePicture);
+
+                                                    addData("Mensual", uidDecimal);
+                                                    UploadData uploadData = new UploadData(context, uidDecimal, fixedDateIn, true);
+                                                    new Thread(uploadData).start();
+
+                                                } else {
+                                                    byte[] writeDataB2 = new byte[16];
+
+                                                    for (int i = 0; i < 16; i++) {
+                                                        writeDataB2[i] = (byte) 0;
+                                                    }
+
+                                                    mifare.writeMifareTag(1, 0, writeDataB2);
+                                                    Toasty.error(Entrance.this, "Grabación Incorrecta", Toast.LENGTH_SHORT).show();
+                                                }
+                                            } else
+                                                Toasty.error(Entrance.this, "Grabación Incorrecta bloque0", Toast.LENGTH_SHORT).show();
                                         } else {
-                                            Toasty.error(Entrance.this, "Grabación Incorrecta", Toast.LENGTH_SHORT).show();
-                                            break;
+                                            String errorMessage = mensual.getMessage();
+                                            Toasty.error(Entrance.this, errorMessage, Toast.LENGTH_SHORT).show();
                                         }
                                     } else {
-                                        Toasty.error(Entrance.this, "La tarjeta no posee salida", Toast.LENGTH_SHORT).show();
+                                        Toasty.error(Entrance.this, "Vehículo en Parqueadero", Toast.LENGTH_SHORT).show();
                                     }
-                                } else if (datosB1[0] == 2 && datosB1[1] == code && datosB1[3] == id) {
-                                    Date ldtExpMensual = new Date(datosB2[8] + 2000, datosB2[9], datosB2[10]);
-                                    if (ldtActual.before(ldtExpMensual)) {
-                                        System.arraycopy(datosB1, 0, writeData, 0, datosB2.length);//Copia manual del arreglo datosB2 a writeData
-
-                                        writeData[0] = (byte) iyear;
-                                        writeData[1] = (byte) imonth;
-                                        writeData[2] = (byte) iday;
-                                        writeData[3] = (byte) ihour;
-                                        writeData[4] = (byte) iminut;
-                                        writeData[8] = Bparameter;
-                                        writeData[10] = (byte) 1;
-
-                                        String sRead = new String(datosB0);
-                                        fixed = sRead.replaceAll("[^\\x20-\\x7e]", "");
-
-                                        if (service.submit(new WriteMifare(mifare, writeData, 2)).get()) {
-                                            Toasty.success(Entrance.this, "Escritura Exitosa", Toast.LENGTH_SHORT).show();
-
-
-                                            addData("Mensual");
-                                        }else
-                                            Toasty.error(Entrance.this, "Grabación Incorrecta", Toast.LENGTH_SHORT).show();
-                                    } else
-                                        Toasty.error(Entrance.this, "Mensualidad vencida", Toast.LENGTH_SHORT).show();
-
                                 } else {
                                     Toasty.error(getBaseContext(), "" + "Tarjeta no pertenece al" +
                                             " parqueadero.", Toast.LENGTH_LONG).show();
@@ -325,7 +316,6 @@ public class Entrance extends AppCompatActivity {
                                 Toasty.error(getBaseContext(), "" + "La lectura ha fallado" +
                                         " por favor vuelva a intentarlo.", Toast.LENGTH_LONG).show();
                             }
-
                         } else
                             Toasty.error(getBaseContext(), "Fallo de autentificación", Toast.LENGTH_LONG).show();
 
@@ -428,7 +418,7 @@ public class Entrance extends AppCompatActivity {
         alert.show();
     }
 
-    public void addData(String veh_tipo) {
+    public void addData(String veh_tipo, int uid) {
         String tipo;
         if (parameter == 0) {
             tipo = "Carro";
@@ -438,10 +428,10 @@ public class Entrance extends AppCompatActivity {
             tipo = "Bicicleta";
         }
 
-        SQLiteDatabase db = SQLiteOpenHelperRegistry.lookup(DbProvider.DATABASE_NAME).getWritableDatabase();
+        SQLiteDatabase db = SQLiteOpenHelperRegistry.lookup(DbProviderM.DATABASE_NAME).getWritableDatabase();
 
         ContentValues register = new ContentValues();
-        register.put("veh_id", fixed);
+        register.put("veh_id", uid);
         register.put("veh_fh_entrada", fixedDateIn);
         register.put("veh_estacion", "MOVIL");
         register.put("veh_usuario", "SISTEMA");

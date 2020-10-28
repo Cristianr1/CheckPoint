@@ -1,4 +1,4 @@
-package com.koiti.checkpoint;
+package com.koiti.checkpointm;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
-import android.util.Log;
 
 import org.jumpmind.symmetric.android.SQLiteOpenHelperRegistry;
 import org.jumpmind.symmetric.android.SymmetricService;
@@ -20,9 +19,9 @@ import org.jumpmind.symmetric.common.ParameterConstants;
 import java.util.Objects;
 import java.util.Properties;
 
-public class DbProvider extends ContentProvider {
+public class DbProviderM extends ContentProvider {
 
-//    "http://104.236.57.82:31415/sync/movil"
+//   "http://104.236.57.82:31415/sync/movil"
 
     private final String REGISTRATION_URL = "http://209.97.160.237:31415/sync/movil";
     private final String NODE_ID = "android";
@@ -61,7 +60,7 @@ public class DbProvider extends ContentProvider {
     private static final String VEHMINUTOS = "veh_minutos";    // Column 26
     private static final String VEHROTACION = "veh_rotacion";    // Column 27
 
-    public static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS  " + TABLE_NAME +
+    public static final String VEHICULOS = "CREATE TABLE IF NOT EXISTS  " + TABLE_NAME +
             " (" + VEHID + " INT PRIMARY KEY, " + VEHENTRADA + " VARCHAR(255) ," + VEHTIPOID + " VARCHAR(255) ,"
             + VEHUSUARIO + " VARCHAR(255) ," + VEHESTACION + " VARCHAR(255) ," + VEHCODIGO + " VARCHAR(225),"
             + VEHTIPO + " VARCHAR(255) ," + VEHSALIDA + " VARCHAR(255) ," + VEHROBADO + " VARCHAR(255) ,"
@@ -71,6 +70,42 @@ public class DbProvider extends ContentProvider {
             + VEHPURGAINICIO + " VARCHAR(255) ," + VEHPURGAFECHAHORA + " VARCHAR(255) ," + VEHCLASE + " VARCHAR(255) ,"
             + VEHLOTE + " VARCHAR(255) ," + VEHPLACA + " VARCHAR(255) ," + VEHDOCUMENTO + " VARCHAR(255) ,"
             + VEHNOMBRE + " VARCHAR(255) ," + VEHMINUTOS + " VARCHAR(255) ," + VEHROTACION + " VARCHAR(255));";
+
+
+    public static final String MENSUALES = "CREATE TABLE IF NOT EXISTS `tb_mensuales` (" +
+            "  `men_nombre` varchar(50) DEFAULT NULL," +
+            "  `men_direccion` varchar(50) DEFAULT NULL," +
+            "  `men_telefono` varchar(20) DEFAULT NULL," +
+            "  `men_id` varchar(10) NOT NULL," +
+            "  `men_placa` varchar(10) DEFAULT NULL," +
+            "  `men_desde` datetime DEFAULT NULL," +
+            "  `men_hasta` datetime DEFAULT NULL," +
+            "  `men_fac_numero` int(11) DEFAULT '0'," +
+            "  `men_vip` char(1) DEFAULT 'N'," +
+            "  `men_lote` varchar(4) DEFAULT 'l01'," +
+            "  `men_facility_code` int(11) DEFAULT '0'," +
+            "  `men_placa2` varchar(10) DEFAULT NULL," +
+            "  `men_fac_prefijo` varchar(10) DEFAULT NULL," +
+            "  `men_id2` varchar(10) DEFAULT NULL," +
+            "  `men_facility_code2` int(11) DEFAULT NULL," +
+            "  `men_valor` decimal(15,2) DEFAULT NULL," +
+            "  `men_horario` varchar(4) DEFAULT 'siem'," +
+            "  `men_documento` varchar(20) DEFAULT NULL," +
+            "  `men_fecha_locatario` date DEFAULT NULL," +
+            "  `men_antipassback` char(1) DEFAULT 'N'," +
+            "  `men_postpago` char(1) DEFAULT 'N'," +
+            "  `men_clase` varchar(10) DEFAULT NULL," +
+            "  `men_locatario` char(1) DEFAULT 'N'," +
+            "  `men_horas` int(11) DEFAULT '0'," +
+            "  `men_picoplaca` varchar(25) DEFAULT NULL," +
+            "  `men_bloqueado` char(1) DEFAULT 'N'," +
+            "  `men_multiple` char(1) DEFAULT 'N'," +
+            "  `men_actualizado` date DEFAULT NULL," +
+            "  `men_renovar_0` char(1) DEFAULT 'N'," +
+            "  `men_renovar0` char(1) DEFAULT 'N'," +
+            "PRIMARY KEY (`men_id`)"+
+            ");";
+
 
     public static final String DATABASE_NAME = "checkpoint.db";
 
@@ -114,7 +149,8 @@ public class DbProvider extends ContentProvider {
         mOpenHelper = new DatabaseHelper(getContext());
 
         // Init the DB here
-        mOpenHelper.getWritableDatabase().execSQL(CREATE_TABLE);
+        mOpenHelper.getWritableDatabase().execSQL(VEHICULOS);
+        mOpenHelper.getWritableDatabase().execSQL(MENSUALES);
 
         // Register the database helper, so it can be shared with the SymmetricService
         SQLiteOpenHelperRegistry.register(DATABASE_NAME, mOpenHelper);

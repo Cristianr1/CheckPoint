@@ -1,4 +1,4 @@
-package com.koiti.checkpoint;
+package com.koiti.checkpointm;
 
 import android.app.PendingIntent;
 import android.content.Context;
@@ -11,17 +11,16 @@ import android.os.Build;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.koiti.checkpoint.MifareThreads.AuthenticationMifare;
-import com.koiti.checkpoint.MifareThreads.Disconnect;
-import com.koiti.checkpoint.MifareThreads.ReadMifare;
-import com.koiti.checkpoint.MifareThreads.WriteMifare;
+import com.koiti.checkpointm.MifareThreads.AuthenticationMifare;
+import com.koiti.checkpointm.MifareThreads.Disconnect;
+import com.koiti.checkpointm.MifareThreads.ReadMifare;
+import com.koiti.checkpointm.MifareThreads.WriteMifare;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;

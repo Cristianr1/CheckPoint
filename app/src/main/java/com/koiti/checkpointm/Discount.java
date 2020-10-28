@@ -1,4 +1,4 @@
-package com.koiti.checkpoint;
+package com.koiti.checkpointm;
 
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;

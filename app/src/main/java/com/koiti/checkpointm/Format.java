@@ -1,4 +1,4 @@
-package com.koiti.checkpoint;
+package com.koiti.checkpointm;
 
 import android.app.PendingIntent;
 import android.content.Context;
@@ -17,9 +17,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.koiti.checkpoint.MifareThreads.FormatSector1;
-import com.koiti.checkpoint.MifareThreads.FormatSector2;
-import com.koiti.checkpoint.MifareThreads.FormatSector3;
+import com.koiti.checkpointm.MifareThreads.FormatSector1;
+import com.koiti.checkpointm.MifareThreads.FormatSector2;
+import com.koiti.checkpointm.MifareThreads.FormatSector3;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

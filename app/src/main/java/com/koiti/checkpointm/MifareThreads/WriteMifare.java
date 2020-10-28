@@ -1,6 +1,6 @@
-package com.koiti.checkpoint.MifareThreads;
+package com.koiti.checkpointm.MifareThreads;
 
-import com.koiti.checkpoint.Mifare;
+import com.koiti.checkpointm.Mifare;
 
 import java.util.concurrent.Callable;
 

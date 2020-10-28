@@ -1,4 +1,4 @@
-package com.koiti.checkpoint;
+package com.koiti.checkpointm;
 
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
@@ -12,15 +12,16 @@ import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.koiti.checkpoint.MifareThreads.AuthenticationMifare;
-import com.koiti.checkpoint.MifareThreads.Disconnect;
-import com.koiti.checkpoint.MifareThreads.ReadMifare;
+import com.koiti.checkpointm.MifareThreads.AuthenticationMifare;
+import com.koiti.checkpointm.MifareThreads.Disconnect;
+import com.koiti.checkpointm.MifareThreads.ReadMifare;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -112,6 +113,16 @@ public class ShowData extends AppCompatActivity {
                 case Mifare.MIFARE_CONNECTION_SUCCESS:
                     ExecutorService service = Executors.newFixedThreadPool(4);
                     try {
+                        String sUid = "";
+                        StringBuilder sbUid = new StringBuilder();
+                        byte[] uid = mifare.getUid();
+                        for (int i = uid.length - 1; i >= 0; i--) {
+                            if (i < 2) {
+                                sUid = String.format("%02X", uid[i] & 0xFF);
+                                sbUid.append(sUid);
+                            }
+                        }
+
                         if (service.submit(new AuthenticationMifare(mifare, context)).get()) {
 
                             byte[] datosB0 = service.submit(new ReadMifare(mifare, 0)).get();
@@ -123,13 +134,16 @@ public class ShowData extends AppCompatActivity {
 
                             if (datosB0 != null && datosB1 != null && datosB2 != null) {
                                 // evaluate if the card belongs to the parking
-                                if (datosB1[1] == code && datosB1[3] == id) {
+//                                if (datosB1[1] == code && datosB1[3] == id) {
 
                                     String sRead = new String(datosB0);
                                     String fixed = sRead.replaceAll("[^\\x20-\\x7e]", "");
+
                                     idTV.setText(fixed);
 
-                                    trade.setText(datosB2[5] + "");
+                                    int uidDecimal = Integer.parseInt(sbUid.toString(), 16);
+
+                                    trade.setText((uid[2] & 0xFF) + "-" + uidDecimal);
                                     codParq.setText(datosB1[1] + "");
                                     idParq.setText(datosB1[3] + "");
                                     dateInput.setText(2000 + datosB2[0] + "-" + datosB2[1] + "-" + datosB2[2] + " " + datosB2[3] + ":" + datosB2[4]);
@@ -166,6 +180,8 @@ public class ShowData extends AppCompatActivity {
                                     final Toast toasty = Toasty.success(ShowData.this, "" + "Lectura Exitosa", Toast.LENGTH_LONG);
                                     toasty.show();
 
+                                    sbUid.delete(0, sbUid.length());
+
                                     Handler handler = new Handler();
                                     handler.postDelayed(new Runnable() {
                                         @Override
@@ -173,9 +189,9 @@ public class ShowData extends AppCompatActivity {
                                             toasty.cancel();
                                         }
                                     }, 700);
-                                } else
-                                    Toasty.error(getBaseContext(), "" + "Tarjeta no pertenece al" +
-                                            " parqueadero.", Toast.LENGTH_LONG).show();
+//                                } else
+//                                    Toasty.error(getBaseContext(), "" + "Tarjeta no pertenece al" +
+//                                            " parqueadero.", Toast.LENGTH_LONG).show();
                             } else
                                 Toasty.error(getBaseContext(), "" + "La lectura ha fallado" +
                                         " por favor vuelva a intentarlo.", Toast.LENGTH_LONG).show();

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CheckPoint</string>
+    <string name="app_name">CheckPointM</string>
     <string-array name="type_discount">
         <item>Tiempo</item>
         <item>Porcentaje</item>

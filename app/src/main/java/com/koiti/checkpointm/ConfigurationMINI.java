@@ -1,4 +1,4 @@
-package com.koiti.checkpoint;
+package com.koiti.checkpointm;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -425,7 +425,7 @@ public class ConfigurationMINI extends AppCompatActivity implements AdapterView.
 
         config.save(url, "url", context);
 
-        SQLiteDatabase db = SQLiteOpenHelperRegistry.lookup(DbProvider.DATABASE_NAME).getWritableDatabase();
+        SQLiteDatabase db = SQLiteOpenHelperRegistry.lookup(DbProviderM.DATABASE_NAME).getWritableDatabase();
 
         Cursor c = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
         List<String> tablas = new ArrayList<>();
@@ -625,7 +625,7 @@ public class ConfigurationMINI extends AppCompatActivity implements AdapterView.
     public AlertDialog alert() {
         AlertDialog.Builder builder = new AlertDialog.Builder(ConfigurationMINI.this);
 
-        final SQLiteDatabase db = SQLiteOpenHelperRegistry.lookup(DbProvider.DATABASE_NAME).getWritableDatabase();
+        final SQLiteDatabase db = SQLiteOpenHelperRegistry.lookup(DbProviderM.DATABASE_NAME).getWritableDatabase();
 
 
         builder.setTitle("Advertencia")

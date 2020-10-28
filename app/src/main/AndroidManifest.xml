@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.koiti.checkpoint">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.koiti.checkpointm">
 
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -24,7 +25,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".SplashActivity"
+            android:name="com.koiti.checkpointm.SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SplashTheme">
             <intent-filter>
@@ -34,37 +35,37 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.koiti.checkpoint.MainActivity"
+            android:name="com.koiti.checkpointm.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name="com.koiti.checkpoint.Configuration" />
-        <activity android:name="com.koiti.checkpoint.ConfigurationMINI" />
-        <activity android:name="com.koiti.checkpoint.Password" />
-        <activity android:name="com.koiti.checkpoint.Entrance">
+        <activity android:name="com.koiti.checkpointm.Configuration" />
+        <activity android:name="com.koiti.checkpointm.ConfigurationMINI" />
+        <activity android:name="com.koiti.checkpointm.Password" />
+        <activity android:name="com.koiti.checkpointm.Entrance">
             <intent-filter>
                 <action android:name="android.nfc.action.TAG_DISCOVERED" />
             </intent-filter>
         </activity>
-        <activity android:name="com.koiti.checkpoint.Discount">
+        <activity android:name="com.koiti.checkpointm.Discount">
             <intent-filter>
                 <action android:name="android.nfc.action.TAG_DISCOVERED" />
             </intent-filter>
         </activity>
-        <activity android:name="com.koiti.checkpoint.Initialize">
+        <activity android:name="com.koiti.checkpointm.Initialize">
             <intent-filter>
                 <action android:name="android.nfc.action.TAG_DISCOVERED" />
             </intent-filter>
         </activity>
-        <activity android:name="com.koiti.checkpoint.Exit">
+        <activity android:name="com.koiti.checkpointm.Exit">
             <intent-filter>
                 <action android:name="android.nfc.action.TAG_DISCOVERED" />
             </intent-filter>
         </activity>
-        <activity android:name="com.koiti.checkpoint.ShowData">
+        <activity android:name="com.koiti.checkpointm.ShowData">
             <intent-filter>
                 <action android:name="android.nfc.action.TAG_DISCOVERED" />
             </intent-filter>
         </activity>
-        <activity android:name="com.koiti.checkpoint.Format">
+        <activity android:name="com.koiti.checkpointm.Format">
             <intent-filter>
                 <action android:name="android.nfc.action.TAG_DISCOVERED" />
             </intent-filter>
@@ -72,7 +73,7 @@
 
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="com.koiti.checkpoint.fileprovider"
+            android:authorities="com.koiti.checkpointm.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -80,8 +81,8 @@
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
         <provider
-            android:name="com.koiti.checkpoint.DbProvider"
-            android:authorities="com.jumpmind.symmetric.DbProvider"
+            android:name="com.koiti.checkpointm.DbProviderM"
+            android:authorities="com.jumpmind.symmetric.DbProviderM"
             android:exported="false">
             <grant-uri-permission android:pathPattern=".*" />
         </provider>
@@ -93,6 +94,8 @@
                 <action android:name="org.jumpmind.symmetric.android.SymmetricService" />
             </intent-filter>
         </service>
+
+
     </application>
 
 </manifest>

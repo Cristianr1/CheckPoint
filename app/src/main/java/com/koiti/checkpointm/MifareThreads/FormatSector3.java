@@ -1,4 +1,4 @@
-package com.koiti.checkpoint.MifareThreads;
+package com.koiti.checkpointm.MifareThreads;
 
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
@@ -6,7 +6,7 @@ import android.util.Log;
 
 import java.io.IOException;
 
-public class FormatSector2 implements Runnable {
+public class FormatSector3 implements Runnable {
     private Tag nfcTag;
     private volatile boolean exit = false;
     private byte[] authenticationKey, keyFormat;
@@ -19,7 +19,7 @@ public class FormatSector2 implements Runnable {
      * @param authenticationKey key for authentication
      * @param keyFormat         key to format
      */
-    public FormatSector2(Tag nfcTag, byte[] authenticationKey, byte[] keyFormat) {
+    public FormatSector3(Tag nfcTag, byte[] authenticationKey, byte[] keyFormat) {
         this.nfcTag = nfcTag;
         this.authenticationKey = authenticationKey;
         this.keyFormat = keyFormat;
@@ -33,10 +33,10 @@ public class FormatSector2 implements Runnable {
             try {
                 mifareClassic.connect();
 
-                isAuthenticated = mifareClassic.authenticateSectorWithKeyA(2, authenticationKey);
+                isAuthenticated = mifareClassic.authenticateSectorWithKeyA(3, authenticationKey);
 
                 if (isAuthenticated)
-                    mifareClassic.writeBlock(11, keyFormat);
+                    mifareClassic.writeBlock(15, keyFormat);
 
                 mifareClassic.close();
             } catch (IOException e) {
@@ -48,7 +48,7 @@ public class FormatSector2 implements Runnable {
 
     private void stop() {
         exit = true;
-        Log.d("hilo 2", "detenido");
+        Log.d("hilo 3", "detenido");
     }
 
     public boolean getAuthenticated() {

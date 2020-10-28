@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.koiti.checkpoint"
+        applicationId "com.koiti.checkpointm"
         minSdkVersion 15
         targetSdkVersion 28
         versionCode 1
@@ -29,4 +29,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation fileTree(dir: 'libs/Symmetric', include: ['*.aar', '*.jar'], exclude: [])
     implementation files('libs/joda-time-2.0.jar')
+    implementation 'com.android.volley:volley:1.1.1'
 }

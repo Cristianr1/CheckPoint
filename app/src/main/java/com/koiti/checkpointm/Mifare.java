@@ -1,4 +1,4 @@
-package com.koiti.checkpoint;
+package com.koiti.checkpointm;
 
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
@@ -160,5 +160,9 @@ public class Mifare {
         }
 
         return true;
+    }
+
+    public byte[] getUid() {
+        return nTag.getId();
     }
 }
